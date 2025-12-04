@@ -1,472 +1,206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHAT ULTRA PRIVADO | FIREBASE PRO</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-:root {
-    --primary: #0a84ff;
-    --primary-glow: #0a84ffaa;
-    --secondary: #ff2a6d;
-    --amoled-bg: #000000;
-    --amoled-card: #111111;
-    --amoled-border: #222222;
-    --neon-blue: #00f3ff;
-    --neon-pink: #ff00ff;
-    --text: #ffffff;
-    --text-secondary: #888888;
-}
-
-body {
-    background: var(--amoled-bg);
-    color: var(--text);
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-#login-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.login-container {
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid var(--amoled-border);
-    border-radius: 20px;
-    padding: 40px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 0 50px rgba(10, 132, 255, 0.3);
-}
-
-.login-title {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    background: linear-gradient(90deg, var(--primary), var(--neon-pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.login-subtitle {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-    font-size: 1rem;
-}
-
-.password-wrapper {
-    position: relative;
-    width: 100%;
-    margin: 25px 0;
-}
-
-.password-input {
-    width: 100%;
-    padding: 18px 20px;
-    padding-right: 50px;
-    font-size: 1.2rem;
-    background: rgba(20, 20, 20, 0.8);
-    border: 2px solid var(--amoled-border);
-    border-radius: 12px;
-    color: white;
-    outline: none;
-    transition: all 0.3s;
-}
-
-.password-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 20px var(--primary-glow);
-}
-
-.toggle-password {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-.login-btn {
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
-    letter-spacing: 1px;
-}
-
-.login-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(10, 132, 255, 0.4);
-}
-
-.security-notice {
-    margin-top: 20px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-#chat-container {
-    display: none;
-    height: 100vh;
-    flex-direction: column;
-}
-
-.chat-header {
-    background: rgba(10, 10, 10, 0.95);
-    border-bottom: 1px solid var(--amoled-border);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.user-info h2 {
-    font-size: 1.5rem;
-    background: linear-gradient(90deg, var(--primary), var(--neon-blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.user-status {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    background: #00ff00;
-    border-radius: 50%;
-}
-
-.header-right {
-    display: flex;
-    gap: 15px;
-}
-
-.header-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.header-btn:hover {
-    background: var(--primary);
-    transform: rotate(15deg);
-}
-
-#chat-box {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    background: #111;
-}
-
-#chat-box::-webkit-scrollbar {
-    width: 6px;
-}
-
-#chat-box::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#chat-box::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 3px;
-}
-
-.message {
-    max-width: 75%;
-    padding: 15px 18px;
-    border-radius: 18px;
-    line-height: 1.5;
-    word-break: break-word;
-}
-
-.message.you {
-    align-self: flex-end;
-    background: linear-gradient(135deg, var(--primary), #0066cc);
-    color: white;
-    border-bottom-right-radius: 5px;
-    box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);
-}
-
-.message.her {
-    align-self: flex-start;
-    background: rgba(30, 30, 30, 0.9);
-    border: 1px solid var(--amoled-border);
-    color: white;
-    border-bottom-left-radius: 5px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.message-time {
-    font-size: 0.7rem;
-    opacity: 0.7;
-    margin-top: 5px;
-    text-align: right;
-}
-
-.message.her .message-time {
-    text-align: left;
-}
-
-.chat-input-area {
-    background: rgba(10, 10, 10, 0.95);
-    border-top: 1px solid var(--amoled-border);
-    padding: 20px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.input-wrapper {
-    flex: 1;
-    position: relative;
-}
-
-#message-input {
-    width: 100%;
-    padding: 18px 20px;
-    padding-right: 50px;
-    background: rgba(20, 20, 20, 0.9);
-    border: 2px solid var(--amoled-border);
-    border-radius: 15px;
-    color: white;
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s;
-}
-
-#message-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 15px var(--primary-glow);
-}
-
-.emoji-btn {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.emoji-btn:hover {
-    color: var(--primary);
-}
-
-#send-btn {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none;
-    color: white;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);
-}
-
-#send-btn:hover {
-    transform: scale(1.1);
-}
-
-.notification {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    background: rgba(20, 20, 20, 0.95);
-    border-left: 4px solid var(--primary);
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 1000;
-    transform: translateX(150%);
-    transition: transform 0.5s;
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-@media (max-width: 768px) {
-    .login-container {
-        padding: 30px 20px;
-        width: 95%;
-    }
-    
-    .login-title {
-        font-size: 2rem;
-    }
-    
-    .message {
-        max-width: 85%;
-    }
-    
-    .chat-header {
-        padding: 12px 15px;
-    }
-    
-    .chat-input-area {
-        padding: 15px;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAT REAL COM ELA 🔥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        #tela-login {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-box {
+            background: #111;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            border: 2px solid #0a84ff;
+        }
+        
+        .login-box h1 {
+            color: #0a84ff;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        #input-senha {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid #333;
+            background: #222;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        #btn-entrar {
+            width: 100%;
+            padding: 15px;
+            background: #0a84ff;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        #chat-area {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        .chat-topo {
+            background: #111;
+            padding: 15px;
+            border-bottom: 2px solid #0a84ff;
+            text-align: center;
+        }
+        
+        .chat-topo h2 {
+            color: #0a84ff;
+            font-size: 1.3rem;
+        }
+        
+        .mensagens {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #000;
+        }
+        
+        .msg {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: 18px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        
+        .msg.voce {
+            background: #0a84ff;
+            margin-left: auto;
+        }
+        
+        .msg.ela {
+            background: #222;
+            margin-right: auto;
+            border: 1px solid #333;
+        }
+        
+        .chat-input {
+            background: #111;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #222;
+        }
+        
+        #input-msg {
+            flex: 1;
+            padding: 12px;
+            border-radius: 20px;
+            border: 2px solid #333;
+            background: #222;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        #btn-enviar {
+            background: #0a84ff;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .online {
+            font-size: 0.8rem;
+            color: #0a84ff;
+            margin-top: 5px;
+        }
+        
+        .digitando {
+            padding: 5px 15px;
+            font-style: italic;
+            color: #888;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-
-<div id="login-screen">
-    <div class="login-container">
-        <div style="margin-bottom: 20px;">
-            <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary);"></i>
-        </div>
-        
-        <h1 class="login-title">CHAT FIREBASE</h1>
-        <p class="login-subtitle">Tempo real • Histórico salvo • Multi-dispositivo</p>
-        
-        <div class="password-wrapper">
-            <input type="password" id="password-input" class="password-input" placeholder="Digite a senha">
-            <button class="toggle-password" id="toggle-password">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
-        
-        <button class="login-btn" id="login-btn">
-            <i class="fas fa-terminal"></i> ENTRAR NO CHAT
-        </button>
-        
-        <div class="security-notice">
-            <i class="fas fa-database"></i>
-            <span>Conectando ao Firebase...</span>
-        </div>
-    </div>
-</div>
-
-<div id="chat-container">
-    <div class="chat-header">
-        <div class="header-left">
-            <div class="avatar">
-                <i class="fas fa-user-astronaut" style="font-size: 2rem; color: var(--primary);"></i>
-            </div>
-            <div class="user-info">
-                <h2>Chat em Tempo Real 🔥</h2>
-                <div class="user-status">
-                    <div class="status-dot"></div>
-                    <span id="connection-status">Conectando...</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="header-right">
-            <button class="header-btn" id="theme-btn">
-                <i class="fas fa-palette"></i>
-            </button>
-            <button class="header-btn" id="clear-btn">
-                <i class="fas fa-broom"></i>
-            </button>
-            <button class="header-btn" id="info-btn">
-                <i class="fas fa-info"></i>
-            </button>
+    <!-- TELA DE LOGIN -->
+    <div id="tela-login">
+        <div class="login-box">
+            <h1>💬 CHAT COM ELA</h1>
+            <p style="color: #888; margin-bottom: 10px;">Digite a senha para entrar</p>
+            <input type="password" id="input-senha" placeholder="Senha: 0306">
+            <button id="btn-entrar">👉 ENTRAR NO CHAT</button>
+            <p style="color: #666; margin-top: 15px; font-size: 0.8rem;">
+                Dica: Use a senha <strong>0306</strong>
+            </p>
         </div>
     </div>
     
-    <div id="chat-box">
-        <div class="message her">
-            <div class="message-text">Conectando ao servidor...</div>
-            <div class="message-time">--:--:--</div>
+    <!-- ÁREA DO CHAT -->
+    <div id="chat-area">
+        <div class="chat-topo">
+            <h2>💕 Conversa Privada</h2>
+            <div class="online">● Online</div>
+        </div>
+        
+        <div class="mensagens" id="mensagens">
+            <div class="msg ela">
+                Aguardando conexão...
+            </div>
+        </div>
+        
+        <div class="digitando" id="digitando">
+            <span id="quem-digita">Ela</span> está digitando...
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="input-msg" placeholder="Escreva aqui..." autocomplete="off">
+            <button id="btn-enviar">➤</button>
         </div>
     </div>
-    
-    <div class="chat-input-area">
-        <div class="input-wrapper">
-            <input type="text" id="message-input" placeholder="Digite sua mensagem..." autocomplete="off" disabled>
-            <button class="emoji-btn" id="emoji-btn">
-                <i class="fas fa-smile"></i>
-            </button>
-        </div>
-        <button id="send-btn" disabled>
-            <i class="fas fa-paper-plane"></i>
-        </button>
-    </div>
-</div>
-
-<div id="notification" class="notification">
-    <i class="fas fa-bell" style="color: var(--primary);"></i>
-    <span id="notification-text">Nova mensagem!</span>
-</div>
 
 <script>
-// Configuração do Firebase - SEU LINK
+// Firebase configuration
 const firebaseConfig = {
     databaseURL: "https://chat-5d4cd-default-rtdb.firebaseio.com/"
 };
@@ -477,273 +211,212 @@ const database = firebase.database();
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos
-    const loginBtn = document.getElementById('login-btn');
-    const passwordInput = document.getElementById('password-input');
-    const togglePassword = document.getElementById('toggle-password');
-    const loginScreen = document.getElementById('login-screen');
-    const chatContainer = document.getElementById('chat-container');
-    const sendBtn = document.getElementById('send-btn');
-    const messageInput = document.getElementById('message-input');
-    const chatBox = document.getElementById('chat-box');
-    const emojiBtn = document.getElementById('emoji-btn');
-    const clearBtn = document.getElementById('clear-btn');
-    const themeBtn = document.getElementById('theme-btn');
-    const infoBtn = document.getElementById('info-btn');
-    const notification = document.getElementById('notification');
-    const notificationText = document.getElementById('notification-text');
-    const connectionStatus = document.getElementById('connection-status');
+    const telaLogin = document.getElementById('tela-login');
+    const chatArea = document.getElementById('chat-area');
+    const inputSenha = document.getElementById('input-senha');
+    const btnEntrar = document.getElementById('btn-entrar');
+    const inputMsg = document.getElementById('input-msg');
+    const btnEnviar = document.getElementById('btn-enviar');
+    const mensagensDiv = document.getElementById('mensagens');
+    const digitandoDiv = document.getElementById('digitando');
+    const quemDigita = document.getElementById('quem-digita');
     
     // Variáveis
-    let currentUser = null;
-    let userId = null;
-    const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯'];
+    let meuNome = '';
+    let meuId = '';
+    let estouDigitando = false;
+    let timeoutDigitando;
     
-    // Função de login - CORRIGIDA
-    function checkPassword() {
-        const password = passwordInput.value;
-        const validPasswords = ['0306', 'amor', 'privado', 'admin', 'senha', 'firebase'];
+    // FUNÇÃO DE LOGIN - SIMPLES E FUNCIONAL
+    function entrarNoChat() {
+        const senha = inputSenha.value;
         
-        console.log('Senha digitada:', password); // Debug
-        console.log('Senhas válidas:', validPasswords); // Debug
+        // SENHAS VÁLIDAS
+        const senhasValidas = ['0306', 'amor', 'senha', '123', 'admin', 'ela', 'voce'];
         
-        if (validPasswords.includes(password)) {
-            console.log('Senha correta!'); // Debug
+        if (senhasValidas.includes(senha)) {
+            // Gera ID único
+            meuId = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            meuNome = 'Usuario_' + Math.floor(Math.random() * 900 + 100);
             
-            currentUser = 'Usuário_' + Math.floor(Math.random() * 1000);
-            userId = 'user_' + Date.now();
+            // Entra no chat
+            telaLogin.style.display = 'none';
+            chatArea.style.display = 'flex';
             
-            // Mostrar transição
-            loginScreen.style.opacity = '0';
-            loginScreen.style.transition = 'opacity 0.5s';
+            // Foca no input
+            setTimeout(() => {
+                inputMsg.focus();
+            }, 300);
+            
+            // Configura Firebase
+            setupFirebase();
+            
+            // Vibração no celular
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+        } else {
+            // Senha errada
+            inputSenha.style.borderColor = '#ff2a6d';
+            inputSenha.style.transform = 'translateX(10px)';
+            inputSenha.value = '';
+            inputSenha.placeholder = 'Errado! Tente: 0306';
             
             setTimeout(() => {
-                loginScreen.style.display = 'none';
-                chatContainer.style.display = 'flex';
-                
-                // Habilitar inputs
-                messageInput.disabled = false;
-                sendBtn.disabled = false;
-                
-                // Carregar mensagens
-                loadMessages();
-                
-                // Escutar novas mensagens
-                listenForMessages();
-                
-                // Foco no input
-                messageInput.focus();
-                
-                showNotification('Conectado! Bem-vindo!', 'success');
-            }, 500);
-        } else {
-            console.log('Senha incorreta!'); // Debug
-            
-            passwordInput.style.borderColor = '#ff2a6d';
-            passwordInput.style.boxShadow = '0 0 15px rgba(255, 42, 109, 0.5)';
-            passwordInput.value = '';
-            passwordInput.placeholder = 'Senha incorreta! Tente: 0306';
-            
-            setTimeout(() => {
-                passwordInput.style.borderColor = '';
-                passwordInput.style.boxShadow = '';
-                passwordInput.placeholder = 'Digite a senha';
-            }, 2000);
+                inputSenha.style.borderColor = '';
+                inputSenha.style.transform = '';
+                inputSenha.placeholder = 'Senha: 0306';
+            }, 1000);
         }
     }
     
-    // Event Listeners
-    loginBtn.addEventListener('click', checkPassword);
-    
-    passwordInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            checkPassword();
-        }
-    });
-    
-    togglePassword.addEventListener('click', function() {
-        const icon = this.querySelector('i');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.className = 'fas fa-eye-slash';
-        } else {
-            passwordInput.type = 'password';
-            icon.className = 'fas fa-eye';
-        }
-    });
-    
-    // Funções do chat
-    function addMessage(text, sender, isYou = false) {
-        const messageDiv = document.createElement('div');
-        const now = new Date();
-        const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
-                          now.getMinutes().toString().padStart(2, '0') + ':' + 
-                          now.getSeconds().toString().padStart(2, '0');
+    // CONFIGURAR FIREBASE
+    function setupFirebase() {
+        // Adiciona usuário online
+        database.ref('online/' + meuId).set({
+            nome: meuNome,
+            hora: Date.now()
+        });
         
-        messageDiv.className = `message ${isYou ? 'you' : 'her'}`;
-        messageDiv.innerHTML = `
-            <div class="message-text">${text}</div>
-            <div class="message-time">${timeString}</div>
-        `;
+        // Remove quando sair
+        window.addEventListener('beforeunload', function() {
+            database.ref('online/' + meuId).remove();
+        });
         
-        chatBox.appendChild(messageDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        
-        if (!isYou) {
-            showNotification('Nova mensagem!', 'info');
-        }
-    }
-    
-    function sendMessage() {
-        const text = messageInput.value.trim();
-        if (!text) return;
-        
-        const messageData = {
-            text: text,
-            sender: currentUser || 'Anônimo',
-            timestamp: Date.now()
-        };
-        
-        // Salvar no Firebase
-        database.ref('messages').push(messageData)
-            .then(() => {
-                addMessage(text, currentUser, true);
-                messageInput.value = '';
-                messageInput.focus();
-            })
-            .catch(error => {
-                console.error('Erro ao enviar:', error);
-                showNotification('Erro ao enviar!', 'error');
-            });
-    }
-    
-    function loadMessages() {
-        database.ref('messages').limitToLast(20).once('value')
-            .then((snapshot) => {
-                const messages = snapshot.val();
-                if (messages) {
-                    // Limpar mensagem inicial
-                    chatBox.innerHTML = '';
+        // Carrega últimas mensagens
+        database.ref('mensagens').limitToLast(20).once('value')
+            .then(snapshot => {
+                const msgs = snapshot.val();
+                if (msgs) {
+                    // Limpa mensagem inicial
+                    mensagensDiv.innerHTML = '';
                     
-                    // Ordenar por timestamp
-                    const messagesArray = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
-                    
-                    messagesArray.forEach(msg => {
-                        const isYou = msg.sender === currentUser;
-                        addMessage(msg.text, msg.sender, isYou);
+                    // Mostra mensagens antigas
+                    Object.values(msgs).forEach(msg => {
+                        adicionarMensagem(msg.texto, msg.quem, msg.quem === meuNome);
                     });
-                    
-                    connectionStatus.textContent = 'Conectado • ' + messagesArray.length + ' mensagens';
                 }
             });
-    }
-    
-    function listenForMessages() {
-        database.ref('messages').limitToLast(1).on('child_added', (snapshot) => {
+        
+        // Escuta novas mensagens
+        database.ref('mensagens').limitToLast(1).on('child_added', snapshot => {
             const msg = snapshot.val();
-            if (msg.sender !== currentUser) {
-                addMessage(msg.text, msg.sender, false);
+            if (msg.quem !== meuNome) {
+                adicionarMensagem(msg.texto, msg.quem, false);
+            }
+        });
+        
+        // Escuta quem está digitando
+        database.ref('digitando').on('value', snapshot => {
+            const digitando = snapshot.val();
+            let alguemDigitando = false;
+            let quem = '';
+            
+            if (digitando) {
+                Object.entries(digitando).forEach(([id, dados]) => {
+                    if (id !== meuId && dados.ativo) {
+                        alguemDigitando = true;
+                        quem = dados.nome;
+                    }
+                });
+            }
+            
+            if (alguemDigitando) {
+                quemDigita.textContent = quem;
+                digitandoDiv.style.display = 'block';
+            } else {
+                digitandoDiv.style.display = 'none';
             }
         });
     }
     
-    // Event Listeners do chat
-    sendBtn.addEventListener('click', sendMessage);
-    
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-    
-    emojiBtn.addEventListener('click', function() {
-        const randomEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-        messageInput.value += randomEmoji;
-        messageInput.focus();
-    });
-    
-    clearBtn.addEventListener('click', function() {
-        if (confirm('Limpar histórico local?')) {
-            chatBox.innerHTML = `
-                <div class="message her">
-                    <div class="message-text">Chat limpo. As mensagens ainda estão no servidor.</div>
-                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
-                </div>
-            `;
-            showNotification('Chat limpo!', 'success');
-        }
-    });
-    
-    themeBtn.addEventListener('click', function() {
-        const themes = ['amoled', 'matrix', 'sunset'];
-        const themeColors = {
-            'amoled': { primary: '#0a84ff', bg: '#000000' },
-            'matrix': { primary: '#00ff41', bg: '#0a0a0a' },
-            'sunset': { primary: '#ff2a6d', bg: '#0a0a2a' }
-        };
+    // ADICIONAR MENSAGEM
+    function adicionarMensagem(texto, quem, souEu) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg ${souEu ? 'voce' : 'ela'}`;
+        msgDiv.textContent = texto;
         
-        const currentTheme = document.documentElement.style.getPropertyValue('--primary') || '#0a84ff';
-        let nextTheme = 'amoled';
+        // Efeito de entrada
+        msgDiv.style.opacity = '0';
+        msgDiv.style.transform = souEu ? 'translateX(20px)' : 'translateX(-20px)';
         
-        // Encontrar próximo tema
-        for (const [theme, colors] of Object.entries(themeColors)) {
-            if (colors.primary === currentTheme) {
-                const currentIndex = themes.indexOf(theme);
-                nextTheme = themes[(currentIndex + 1) % themes.length];
-                break;
-            }
-        }
+        mensagensDiv.appendChild(msgDiv);
         
-        const colors = themeColors[nextTheme];
-        document.documentElement.style.setProperty('--primary', colors.primary);
-        document.documentElement.style.setProperty('--amoled-bg', colors.bg);
-        
-        showNotification(`Tema: ${nextTheme}`, 'info');
-    });
-    
-    infoBtn.addEventListener('click', function() {
-        alert(`CHAT FIREBASE v1.0
-
-• Mensagens em tempo real
-• Histórico salvo no Firebase
-• Funciona em qualquer dispositivo
-• Design AMOLED premium
-
-Senhas válidas: 
-0306, amor, privado, admin, senha, firebase
-
-Servidor: chat-5d4cd-default-rtdb.firebaseio.com`);
-    });
-    
-    function showNotification(text, type) {
-        notificationText.textContent = text;
-        
-        if (type === 'success') {
-            notification.style.borderLeftColor = '#00ff00';
-        } else if (type === 'error') {
-            notification.style.borderLeftColor = '#ff2a6d';
-        } else {
-            notification.style.borderLeftColor = 'var(--primary)';
-        }
-        
-        notification.classList.add('show');
-        
+        // Animação
         setTimeout(() => {
-            notification.classList.remove('show');
-        }, 3000);
+            msgDiv.style.transition = 'all 0.3s';
+            msgDiv.style.opacity = '1';
+            msgDiv.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Scroll
+        mensagensDiv.scrollTop = mensagensDiv.scrollHeight;
     }
     
-    // Verificar conexão Firebase
-    database.ref('.info/connected').on('value', (snapshot) => {
-        if (snapshot.val() === true) {
-            connectionStatus.textContent = 'Conectado ao Firebase';
-        } else {
-            connectionStatus.textContent = 'Desconectado';
+    // ENVIAR MENSAGEM
+    function enviarMensagem() {
+        const texto = inputMsg.value.trim();
+        if (texto === '') return;
+        
+        // Salva no Firebase
+        database.ref('mensagens').push({
+            texto: texto,
+            quem: meuNome,
+            hora: Date.now()
+        });
+        
+        // Mostra localmente
+        adicionarMensagem(texto, meuNome, true);
+        
+        // Limpa input
+        inputMsg.value = '';
+        
+        // Para de mostrar "digitando"
+        database.ref('digitando/' + meuId).remove();
+        estouDigitando = false;
+        clearTimeout(timeoutDigitando);
+    }
+    
+    // DETECTAR DIGITAÇÃO
+    inputMsg.addEventListener('input', function() {
+        if (!estouDigitando) {
+            estouDigitando = true;
+            database.ref('digitando/' + meuId).set({
+                nome: meuNome,
+                ativo: true
+            });
+        }
+        
+        clearTimeout(timeoutDigitando);
+        timeoutDigitando = setTimeout(() => {
+            database.ref('digitando/' + meuId).remove();
+            estouDigitando = false;
+        }, 2000);
+    });
+    
+    // EVENT LISTENERS
+    
+    // Login
+    btnEntrar.addEventListener('click', entrarNoChat);
+    inputSenha.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') entrarNoChat();
+    });
+    
+    // Enviar mensagem
+    btnEnviar.addEventListener('click', enviarMensagem);
+    inputMsg.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            enviarMensagem();
         }
     });
     
-    // Foco no campo de senha
-    passwordInput.focus();
+    // Foco na senha ao carregar
+    inputSenha.focus();
+    
+    // Touch events para melhor experiência mobile
+    document.addEventListener('touchstart', function() {}, {passive: true});
 });
 </script>
 </body>
