@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHAT ULTRA PRIVADO | AMOLED PRO</title>
+<title>CHAT ULTRA PRIVADO | FIREBASE PRO</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
 <style>
 * {
     margin: 0;
@@ -395,6 +400,27 @@ body {
     transform: translateX(0);
 }
 
+.online-users {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid var(--amoled-border);
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: none;
+}
+
+.typing-indicator {
+    padding: 10px 20px;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: none;
+}
+
 @media (max-width: 768px) {
     .login-container {
         padding: 30px 20px;
@@ -431,8 +457,8 @@ body {
             <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary);"></i>
         </div>
         
-        <h1 class="login-title">CHAT ULTRA PRIVADO</h1>
-        <p class="login-subtitle">Acesso exclusivo • Criptografia local • Zero rastreamento</p>
+        <h1 class="login-title">CHAT FIREBASE PRO</h1>
+        <p class="login-subtitle">Conexão em tempo real • Histórico salvo • Multi-dispositivo</p>
         
         <div class="password-wrapper">
             <input type="password" id="password-input" class="password-input" placeholder="Digite a senha mestre" autocomplete="off">
@@ -441,13 +467,13 @@ body {
             </button>
         </div>
         
-        <button class="login-btn" onclick="checkPassword()">
+        <button class="login-btn" id="login-btn">
             <i class="fas fa-terminal"></i> ACESSAR SISTEMA
         </button>
         
         <div class="security-notice">
-            <i class="fas fa-shield-alt"></i>
-            <span>Este dispositivo não armazena logs de conversa</span>
+            <i class="fas fa-database"></i>
+            <span>Conectando ao Firebase Realtime Database...</span>
         </div>
     </div>
 </div>
@@ -459,15 +485,18 @@ body {
                 <i class="fas fa-user-astronaut" style="font-size: 2rem; color: var(--primary);"></i>
             </div>
             <div class="user-info">
-                <h2>Conversa Privada 🔒</h2>
+                <h2>Chat Firebase 🔥</h2>
                 <div class="user-status">
                     <div class="status-dot"></div>
-                    <span>Criptografia ativa • Conexão segura</span>
+                    <span id="connection-status">Conectando...</span>
                 </div>
             </div>
         </div>
         
         <div class="header-right">
+            <div class="online-users" id="online-users">
+                <i class="fas fa-users"></i> <span id="online-count">1</span> online
+            </div>
             <button class="header-btn" id="theme-btn" title="Alternar tema">
                 <i class="fas fa-palette"></i>
             </button>
@@ -482,23 +511,23 @@ body {
     
     <div id="chat-box">
         <div class="message her">
-            <div class="message-text">Sistema iniciado. Conexão segura estabelecida. 🔐</div>
-            <div class="message-time">23:41:05</div>
+            <div class="message-text">Conectando ao servidor Firebase... 🔥</div>
+            <div class="message-time">--:--:--</div>
         </div>
-        <div class="message her">
-            <div class="message-text">Use este canal para comunicação privada. Mensagens são transmitidas apenas localmente. 📡</div>
-            <div class="message-time">23:41:10</div>
-        </div>
+    </div>
+    
+    <div id="typing-indicator" class="typing-indicator">
+        <span id="typing-text"></span>
     </div>
     
     <div class="chat-input-area">
         <div class="input-wrapper">
-            <input type="text" id="message-input" placeholder="Digite sua mensagem criptografada...">
+            <input type="text" id="message-input" placeholder="Digite sua mensagem..." autocomplete="off" disabled>
             <button class="emoji-btn" id="emoji-btn">
                 <i class="fas fa-smile"></i>
             </button>
         </div>
-        <button id="send-btn">
+        <button id="send-btn" disabled>
             <i class="fas fa-paper-plane"></i>
         </button>
     </div>
@@ -510,7 +539,25 @@ body {
 </div>
 
 <script>
+// Firebase Configuration - SUA CONEXÃO AQUI
+const firebaseConfig = {
+    databaseURL: "https://chat-5d4cd-default-rtdb.firebaseio.com/"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// Variáveis globais
+let currentUser = null;
+let userId = null;
+let isTyping = false;
+let typingTimeout = null;
+const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯', '👀'];
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Elementos
+    const loginBtn = document.getElementById('login-btn');
     const passwordInput = document.getElementById('password-input');
     const togglePassword = document.getElementById('toggle-password');
     const loginScreen = document.getElementById('login-screen');
@@ -524,22 +571,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const infoBtn = document.getElementById('info-btn');
     const notification = document.getElementById('notification');
     const notificationText = document.getElementById('notification-text');
+    const connectionStatus = document.getElementById('connection-status');
+    const onlineUsers = document.getElementById('online-users');
+    const onlineCount = document.getElementById('online-count');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const typingText = document.getElementById('typing-text');
     
-    const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯', '👀'];
-    let currentTheme = 'amoled';
+    // Gerar ID único para o usuário
+    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
+    // Função de login
     function checkPassword() {
         const password = passwordInput.value;
-        const validPasswords = ['0306', 'amor', 'privado', 'admin', 'senha'];
+        const validPasswords = ['0306', 'amor', 'privado', 'admin', 'senha', 'firebase'];
         
         if (validPasswords.includes(password)) {
+            currentUser = 'Usuário_' + Math.floor(Math.random() * 1000);
+            
+            // Atualizar status online
+            database.ref('online/' + userId).set({
+                name: currentUser,
+                lastSeen: firebase.database.ServerValue.TIMESTAMP
+            });
+            
+            // Remover usuário quando desconectar
+            window.addEventListener('beforeunload', function() {
+                database.ref('online/' + userId).remove();
+            });
+            
             loginScreen.style.opacity = '0';
             loginScreen.style.transition = 'opacity 0.5s';
             
             setTimeout(() => {
                 loginScreen.style.display = 'none';
                 chatContainer.style.display = 'flex';
-                showNotification('Sistema desbloqueado! Bem-vindo!', 'success');
+                showNotification(`Bem-vindo, ${currentUser}!`, 'success');
+                
+                // Habilitar inputs
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
+                
+                // Carregar mensagens
+                loadMessages();
+                
+                // Escutar novas mensagens
+                listenForMessages();
+                
+                // Escutar usuários online
+                listenForOnlineUsers();
+                
+                // Escutar digitação
+                listenForTyping();
+                
                 messageInput.focus();
             }, 500);
         } else {
@@ -555,6 +638,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1500);
         }
     }
+    
+    // Event Listeners
+    loginBtn.addEventListener('click', checkPassword);
     
     passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -573,21 +659,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    function addMessage(text, sender) {
+    // Funções do chat
+    function addMessage(text, sender, isYou = false) {
         const messageDiv = document.createElement('div');
         const now = new Date();
         const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
                           now.getMinutes().toString().padStart(2, '0') + ':' + 
                           now.getSeconds().toString().padStart(2, '0');
         
-        messageDiv.className = `message ${sender}`;
+        messageDiv.className = `message ${isYou ? 'you' : 'her'}`;
         messageDiv.innerHTML = `
             <div class="message-text">${text}</div>
             <div class="message-time">${timeString}</div>
         `;
         
         messageDiv.style.opacity = '0';
-        messageDiv.style.transform = sender === 'you' ? 'translateX(20px)' : 'translateX(-20px)';
+        messageDiv.style.transform = isYou ? 'translateX(20px)' : 'translateX(-20px)';
         
         chatBox.appendChild(messageDiv);
         
@@ -599,9 +686,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         chatBox.scrollTop = chatBox.scrollHeight;
         
-        if (sender === 'her') {
-            showNotification('Nova mensagem recebida', 'info');
-            if (document.hidden) document.title = '💬 Nova mensagem!';
+        if (!isYou) {
+            showNotification('Nova mensagem!', 'info');
+            if (document.hidden) {
+                document.title = '💬 Nova mensagem!';
+            }
         }
     }
     
@@ -609,27 +698,126 @@ document.addEventListener('DOMContentLoaded', function() {
         const text = messageInput.value.trim();
         if (!text) return;
         
-        addMessage(text, 'you');
+        // Salvar no Firebase
+        const messageData = {
+            text: text,
+            sender: currentUser,
+            userId: userId,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
         
-        setTimeout(() => {
-            const replies = [
-                'Recebi sua mensagem!',
-                'Interessante... continue!',
-                'Isso é confidencial! 🔐',
-                'Entendido perfeitamente!',
-                'Mensagem recebida com sucesso!',
-                'Vou guardar isso comigo...',
-                'Sua mensagem foi criptografada!',
-                'Privacidade garantida! 🔒'
-            ];
-            const randomReply = replies[Math.floor(Math.random() * replies.length)];
-            addMessage(randomReply, 'her');
-        }, 300 + Math.random() * 700);
-        
-        messageInput.value = '';
-        messageInput.focus();
+        database.ref('messages').push(messageData)
+            .then(() => {
+                // Mostrar localmente
+                addMessage(text, currentUser, true);
+                messageInput.value = '';
+                
+                // Parar de digitar
+                database.ref('typing/' + userId).remove();
+                isTyping = false;
+                clearTimeout(typingTimeout);
+                
+                messageInput.focus();
+            })
+            .catch(error => {
+                console.error('Erro ao enviar mensagem:', error);
+                showNotification('Erro ao enviar mensagem!', 'error');
+            });
     }
     
+    function loadMessages() {
+        database.ref('messages').limitToLast(50).once('value')
+            .then((snapshot) => {
+                const messages = snapshot.val();
+                if (messages) {
+                    // Limpar mensagem inicial
+                    chatBox.innerHTML = '';
+                    
+                    // Ordenar por timestamp
+                    const messagesArray = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
+                    
+                    messagesArray.forEach(msg => {
+                        const isYou = msg.userId === userId;
+                        addMessage(msg.text, msg.sender, isYou);
+                    });
+                    
+                    connectionStatus.textContent = 'Conectado • ' + messagesArray.length + ' mensagens';
+                }
+            });
+    }
+    
+    function listenForMessages() {
+        database.ref('messages').limitToLast(1).on('child_added', (snapshot) => {
+            const msg = snapshot.val();
+            // Não mostrar a própria mensagem novamente
+            if (msg.userId !== userId) {
+                addMessage(msg.text, msg.sender, false);
+            }
+        });
+    }
+    
+    function listenForOnlineUsers() {
+        database.ref('online').on('value', (snapshot) => {
+            const users = snapshot.val();
+            if (users) {
+                const count = Object.keys(users).length;
+                onlineCount.textContent = count;
+                onlineUsers.style.display = 'block';
+                
+                // Atualizar status
+                database.ref('online/' + userId).update({
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP
+                });
+                
+                // Remover usuários inativos (últimos 30 segundos)
+                const now = Date.now();
+                Object.entries(users).forEach(([key, user]) => {
+                    if (now - user.lastSeen > 30000) {
+                        database.ref('online/' + key).remove();
+                    }
+                });
+            }
+        });
+    }
+    
+    function listenForTyping() {
+        database.ref('typing').on('value', (snapshot) => {
+            const typingUsers = snapshot.val();
+            if (typingUsers) {
+                const currentTyping = Object.entries(typingUsers)
+                    .filter(([key, user]) => key !== userId && user.name !== currentUser)
+                    .map(([key, user]) => user.name);
+                
+                if (currentTyping.length > 0) {
+                    typingText.textContent = currentTyping[0] + ' está digitando...';
+                    typingIndicator.style.display = 'block';
+                } else {
+                    typingIndicator.style.display = 'none';
+                }
+            } else {
+                typingIndicator.style.display = 'none';
+            }
+        });
+    }
+    
+    // Detectar digitação
+    messageInput.addEventListener('input', function() {
+        if (!isTyping) {
+            isTyping = true;
+            database.ref('typing/' + userId).set({
+                name: currentUser,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+        
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            database.ref('typing/' + userId).remove();
+            isTyping = false;
+        }, 2000);
+    });
+    
+    // Event Listeners do chat
     sendBtn.addEventListener('click', sendMessage);
     
     messageInput.addEventListener('keypress', function(e) {
@@ -651,14 +839,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     clearBtn.addEventListener('click', function() {
-        if (confirm('Tem certeza que deseja limpar todo o histórico de conversa?')) {
-            chatBox.innerHTML = `
-                <div class="message her">
-                    <div class="message-text">Histórico de conversa limpo. 🔄</div>
-                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
-                </div>
-            `;
-            showNotification('Chat limpo com sucesso', 'success');
+        if (confirm('Limpar todo o histórico do chat?\nIsso apagará do servidor também!')) {
+            database.ref('messages').remove()
+                .then(() => {
+                    chatBox.innerHTML = `
+                        <div class="message her">
+                            <div class="message-text">Histórico de conversa limpo. 🔄</div>
+                            <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    `;
+                    showNotification('Chat limpo com sucesso!', 'success');
+                })
+                .catch(error => {
+                    console.error('Erro ao limpar chat:', error);
+                    showNotification('Erro ao limpar chat!', 'error');
+                });
         }
     });
     
@@ -670,27 +865,40 @@ document.addEventListener('DOMContentLoaded', function() {
             'sunset': { primary: '#ff2a6d', bg: '#0a0a2a' }
         };
         
-        currentTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
-        const colors = themeColors[currentTheme];
+        const currentTheme = document.documentElement.style.getPropertyValue('--primary') || '#0a84ff';
+        let nextTheme = 'amoled';
         
+        // Encontrar próximo tema
+        for (const [theme, colors] of Object.entries(themeColors)) {
+            if (colors.primary === currentTheme) {
+                const currentIndex = themes.indexOf(theme);
+                nextTheme = themes[(currentIndex + 1) % themes.length];
+                break;
+            }
+        }
+        
+        const colors = themeColors[nextTheme];
         document.documentElement.style.setProperty('--primary', colors.primary);
         document.documentElement.style.setProperty('--amoled-bg', colors.bg);
         
-        this.innerHTML = `<i class="fas fa-${currentTheme === 'matrix' ? 'code' : currentTheme === 'sunset' ? 'sun' : 'moon'}"></i>`;
-        showNotification(`Tema alterado: ${currentTheme.toUpperCase()}`, 'info');
+        this.innerHTML = `<i class="fas fa-${nextTheme === 'matrix' ? 'code' : nextTheme === 'sunset' ? 'sun' : 'moon'}"></i>`;
+        showNotification(`Tema: ${nextTheme.toUpperCase()}`, 'info');
     });
     
     infoBtn.addEventListener('click', function() {
-        alert(`CHAT ULTRA PRIVADO v2.0
+        alert(`CHAT FIREBASE PRO v3.0
 
-• Criptografia: AES-256 local
-• Transmissão: BroadcastChannel API
-• Armazenamento: Zero logs
-• Segurança: Autodestruição após 1h inatividade
+• Conexão em tempo real
+• Histórico salvo no Firebase
+• Multi-usuário online
+• Indicação de digitação
+• Notificações em tempo real
 
-Senhas válidas: 0306, amor, privado, admin, senha
+Servidor: chat-5d4cd-default-rtdb.firebaseio.com
+Usuário: ${currentUser || 'Não conectado'}
+ID: ${userId}
 
-Desenvolvido para comunicação 100% privada.`);
+Senhas válidas: 0306, amor, privado, admin, senha, firebase`);
     });
     
     function showNotification(text, type) {
@@ -711,12 +919,25 @@ Desenvolvido para comunicação 100% privada.`);
         }, 3000);
     }
     
+    // Foco no campo de senha
     passwordInput.focus();
     
+    // Atualizar título da página
     let originalTitle = document.title;
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
             document.title = originalTitle;
+        }
+    });
+    
+    // Verificar conexão Firebase
+    database.ref('.info/connected').on('value', (snapshot) => {
+        if (snapshot.val() === true) {
+            connectionStatus.textContent = 'Conectado ao Firebase';
+            connectionStatus.style.color = '#00ff00';
+        } else {
+            connectionStatus.textContent = 'Desconectado';
+            connectionStatus.style.color = '#ff2a6d';
         }
     });
 });
