@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHAT REAL COM ELA 🔥</title>
+    <title></title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            background: #000;
-            color: white;
-            font-family: Arial, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             height: 100vh;
             overflow: hidden;
             touch-action: manipulation;
         }
         
-        #tela-login {
+        #tela-entrada {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
+            background: #000000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -34,389 +35,386 @@
             z-index: 1000;
         }
         
-        .login-box {
-            background: #111;
-            padding: 25px;
-            border-radius: 15px;
+        .container-entrada {
+            background: #111111;
+            padding: 30px;
+            border-radius: 12px;
             width: 90%;
-            max-width: 350px;
-            text-align: center;
-            border: 2px solid #0a84ff;
+            max-width: 320px;
+            border: 1px solid #222222;
         }
         
-        .login-box h1 {
-            color: #0a84ff;
-            margin-bottom: 10px;
-            font-size: 1.8rem;
-        }
-        
-        #input-senha {
+        #input-codigo {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             margin: 15px 0;
-            border-radius: 10px;
-            border: 2px solid #333;
-            background: #222;
-            color: white;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            border: 2px solid #333333;
+            background: #222222;
+            color: #ffffff;
+            font-size: 16px;
             text-align: center;
+            letter-spacing: 2px;
+            outline: none;
         }
         
-        #btn-entrar {
+        #input-codigo:focus {
+            border-color: #0a84ff;
+        }
+        
+        #btn-acessar {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background: #0a84ff;
             border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: bold;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background 0.2s;
         }
         
-        #chat-area {
+        #btn-acessar:active {
+            background: #007aff;
+        }
+        
+        #area-principal {
             display: none;
             height: 100vh;
             flex-direction: column;
         }
         
-        .chat-topo {
-            background: #111;
-            padding: 15px;
-            border-bottom: 2px solid #0a84ff;
-            text-align: center;
+        .topo {
+            background: #111111;
+            padding: 12px 16px;
+            border-bottom: 1px solid #222222;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .chat-topo h2 {
-            color: #0a84ff;
-            font-size: 1.3rem;
+        .indicador {
+            width: 8px;
+            height: 8px;
+            background: #30d158;
+            border-radius: 50%;
         }
         
-        .mensagens {
+        .conversas {
             flex: 1;
-            padding: 15px;
             overflow-y: auto;
-            background: #000;
+            padding: 16px;
+            background: #000000;
         }
         
         .msg {
-            margin: 10px 0;
-            padding: 12px 15px;
+            margin: 8px 0;
+            padding: 12px 16px;
             border-radius: 18px;
             max-width: 85%;
             word-wrap: break-word;
+            line-height: 1.4;
         }
         
-        .msg.voce {
+        .msg.local {
             background: #0a84ff;
             margin-left: auto;
+            border-bottom-right-radius: 4px;
         }
         
-        .msg.ela {
-            background: #222;
+        .msg.remota {
+            background: #1c1c1e;
             margin-right: auto;
-            border: 1px solid #333;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #2c2c2e;
         }
         
-        .chat-input {
-            background: #111;
-            padding: 12px;
+        .entrada {
+            background: #111111;
+            padding: 12px 16px;
+            border-top: 1px solid #222222;
             display: flex;
             gap: 10px;
-            border-top: 1px solid #222;
         }
         
         #input-msg {
             flex: 1;
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 20px;
-            border: 2px solid #333;
-            background: #222;
-            color: white;
-            font-size: 1rem;
+            border: 1px solid #333333;
+            background: #222222;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        #input-msg:focus {
+            border-color: #0a84ff;
         }
         
         #btn-enviar {
             background: #0a84ff;
             border: none;
-            width: 45px;
-            height: 45px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            color: white;
-            font-size: 1.2rem;
+            color: #ffffff;
+            font-size: 18px;
             cursor: pointer;
-        }
-        
-        .online {
-            font-size: 0.8rem;
-            color: #0a84ff;
-            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .digitando {
-            padding: 5px 15px;
+            padding: 8px 16px;
+            color: #8e8e93;
+            font-size: 14px;
             font-style: italic;
-            color: #888;
-            font-size: 0.9rem;
             display: none;
+        }
+        
+        .conversas::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+        
+        @keyframes entrada {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .msg {
+            animation: entrada 0.2s ease-out;
         }
     </style>
 </head>
 <body>
-    <!-- TELA DE LOGIN -->
-    <div id="tela-login">
-        <div class="login-box">
-            <h1>💬 CHAT COM ELA</h1>
-            <p style="color: #888; margin-bottom: 10px;">Digite a senha para entrar</p>
-            <input type="password" id="input-senha" placeholder="Senha: 0306">
-            <button id="btn-entrar">👉 ENTRAR NO CHAT</button>
-            <p style="color: #666; margin-top: 15px; font-size: 0.8rem;">
-                Dica: Use a senha <strong>0306</strong>
-            </p>
+    <div id="tela-entrada">
+        <div class="container-entrada">
+            <input type="password" id="input-codigo" placeholder="••••" autocomplete="off" maxlength="4">
+            <button id="btn-acessar">→</button>
         </div>
     </div>
     
-    <!-- ÁREA DO CHAT -->
-    <div id="chat-area">
-        <div class="chat-topo">
-            <h2>💕 Conversa Privada</h2>
-            <div class="online">● Online</div>
+    <div id="area-principal">
+        <div class="topo">
+            <div class="indicador"></div>
+            <div style="font-size: 14px; color: #8e8e93;">•</div>
         </div>
         
-        <div class="mensagens" id="mensagens">
-            <div class="msg ela">
-                Aguardando conexão...
+        <div class="conversas" id="conversas">
+            <div class="msg remota">
+                •
             </div>
         </div>
         
         <div class="digitando" id="digitando">
-            <span id="quem-digita">Ela</span> está digitando...
+            <span id="texto-digitando"></span>
         </div>
         
-        <div class="chat-input">
-            <input type="text" id="input-msg" placeholder="Escreva aqui..." autocomplete="off">
-            <button id="btn-enviar">➤</button>
+        <div class="entrada">
+            <input type="text" id="input-msg" placeholder="•" autocomplete="off">
+            <button id="btn-enviar">→</button>
         </div>
     </div>
 
 <script>
-// Firebase configuration
+// Firebase
 const firebaseConfig = {
     databaseURL: "https://chat-5d4cd-default-rtdb.firebaseio.com/"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos
-    const telaLogin = document.getElementById('tela-login');
-    const chatArea = document.getElementById('chat-area');
-    const inputSenha = document.getElementById('input-senha');
-    const btnEntrar = document.getElementById('btn-entrar');
+    const telaEntrada = document.getElementById('tela-entrada');
+    const areaPrincipal = document.getElementById('area-principal');
+    const inputCodigo = document.getElementById('input-codigo');
+    const btnAcessar = document.getElementById('btn-acessar');
     const inputMsg = document.getElementById('input-msg');
     const btnEnviar = document.getElementById('btn-enviar');
-    const mensagensDiv = document.getElementById('mensagens');
-    const digitandoDiv = document.getElementById('digitando');
-    const quemDigita = document.getElementById('quem-digita');
+    const conversas = document.getElementById('conversas');
+    const digitando = document.getElementById('digitando');
+    const textoDigitando = document.getElementById('texto-digitando');
     
-    // Variáveis
-    let meuNome = '';
-    let meuId = '';
-    let estouDigitando = false;
+    let idUsuario = '';
+    let digitandoAtivo = false;
     let timeoutDigitando;
     
-    // FUNÇÃO DE LOGIN - SIMPLES E FUNCIONAL
-    function entrarNoChat() {
-        const senha = inputSenha.value;
+    // Acesso
+    function acessar() {
+        const codigo = inputCodigo.value;
+        const codigos = ['0306', '0000', '1234', '1111', '2222', '3333'];
         
-        // SENHAS VÁLIDAS
-        const senhasValidas = ['0306', 'amor', 'senha', '123', 'admin', 'ela', 'voce'];
-        
-        if (senhasValidas.includes(senha)) {
-            // Gera ID único
-            meuId = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            meuNome = 'Usuario_' + Math.floor(Math.random() * 900 + 100);
+        if (codigos.includes(codigo)) {
+            idUsuario = 'u_' + Date.now() + Math.random().toString(36).substr(2, 6);
             
-            // Entra no chat
-            telaLogin.style.display = 'none';
-            chatArea.style.display = 'flex';
+            telaEntrada.style.opacity = '0';
             
-            // Foca no input
             setTimeout(() => {
-                inputMsg.focus();
+                telaEntrada.style.display = 'none';
+                areaPrincipal.style.display = 'flex';
+                
+                setTimeout(() => {
+                    inputMsg.focus();
+                }, 100);
+                
+                conectar();
             }, 300);
-            
-            // Configura Firebase
-            setupFirebase();
-            
-            // Vibração no celular
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-            
         } else {
-            // Senha errada
-            inputSenha.style.borderColor = '#ff2a6d';
-            inputSenha.style.transform = 'translateX(10px)';
-            inputSenha.value = '';
-            inputSenha.placeholder = 'Errado! Tente: 0306';
+            inputCodigo.style.borderColor = '#ff453a';
+            inputCodigo.value = '';
+            inputCodigo.placeholder = '••••';
             
             setTimeout(() => {
-                inputSenha.style.borderColor = '';
-                inputSenha.style.transform = '';
-                inputSenha.placeholder = 'Senha: 0306';
+                inputCodigo.style.borderColor = '';
             }, 1000);
         }
     }
     
-    // CONFIGURAR FIREBASE
-    function setupFirebase() {
-        // Adiciona usuário online
-        database.ref('online/' + meuId).set({
-            nome: meuNome,
-            hora: Date.now()
+    // Conexão
+    function conectar() {
+        // Presença
+        database.ref('presenca/' + idUsuario).set({
+            t: Date.now()
         });
         
-        // Remove quando sair
-        window.addEventListener('beforeunload', function() {
-            database.ref('online/' + meuId).remove();
+        window.addEventListener('beforeunload', () => {
+            database.ref('presenca/' + idUsuario).remove();
         });
         
-        // Carrega últimas mensagens
-        database.ref('mensagens').limitToLast(20).once('value')
-            .then(snapshot => {
-                const msgs = snapshot.val();
-                if (msgs) {
-                    // Limpa mensagem inicial
-                    mensagensDiv.innerHTML = '';
-                    
-                    // Mostra mensagens antigas
-                    Object.values(msgs).forEach(msg => {
-                        adicionarMensagem(msg.texto, msg.quem, msg.quem === meuNome);
-                    });
-                }
-            });
-        
-        // Escuta novas mensagens
-        database.ref('mensagens').limitToLast(1).on('child_added', snapshot => {
-            const msg = snapshot.val();
-            if (msg.quem !== meuNome) {
-                adicionarMensagem(msg.texto, msg.quem, false);
+        // Remover inativos
+        database.ref('presenca').on('value', (snapshot) => {
+            const agora = Date.now();
+            const dados = snapshot.val();
+            
+            if (dados) {
+                Object.entries(dados).forEach(([id, info]) => {
+                    if (agora - info.t > 30000) {
+                        database.ref('presenca/' + id).remove();
+                    }
+                });
             }
         });
         
-        // Escuta quem está digitando
-        database.ref('digitando').on('value', snapshot => {
-            const digitando = snapshot.val();
-            let alguemDigitando = false;
-            let quem = '';
+        // Ouvir mensagens
+        database.ref('mensagens').limitToLast(1).on('child_added', (snapshot) => {
+            const dados = snapshot.val();
             
-            if (digitando) {
-                Object.entries(digitando).forEach(([id, dados]) => {
-                    if (id !== meuId && dados.ativo) {
+            if (dados && dados.id !== idUsuario) {
+                adicionarMensagem(dados.txt, false);
+                
+                // Notificação
+                if (document.hidden) {
+                    document.title = '•';
+                    
+                    setTimeout(() => {
+                        document.title = '';
+                    }, 1000);
+                }
+            }
+        });
+        
+        // Ouvir digitação
+        database.ref('digitando').on('value', (snapshot) => {
+            const dados = snapshot.val();
+            let alguemDigitando = false;
+            
+            if (dados) {
+                Object.entries(dados).forEach(([id, info]) => {
+                    if (id !== idUsuario && info.a) {
                         alguemDigitando = true;
-                        quem = dados.nome;
+                        textoDigitando.textContent = '•';
                     }
                 });
             }
             
-            if (alguemDigitando) {
-                quemDigita.textContent = quem;
-                digitandoDiv.style.display = 'block';
-            } else {
-                digitandoDiv.style.display = 'none';
-            }
+            digitando.style.display = alguemDigitando ? 'block' : 'none';
         });
+        
+        // Limpar mensagens antigas periodicamente
+        setInterval(() => {
+            database.ref('mensagens').remove();
+        }, 3600000); // 1 hora
     }
     
-    // ADICIONAR MENSAGEM
-    function adicionarMensagem(texto, quem, souEu) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `msg ${souEu ? 'voce' : 'ela'}`;
-        msgDiv.textContent = texto;
+    // Mensagem
+    function adicionarMensagem(texto, local) {
+        const msg = document.createElement('div');
+        msg.className = `msg ${local ? 'local' : 'remota'}`;
+        msg.textContent = texto;
         
-        // Efeito de entrada
-        msgDiv.style.opacity = '0';
-        msgDiv.style.transform = souEu ? 'translateX(20px)' : 'translateX(-20px)';
-        
-        mensagensDiv.appendChild(msgDiv);
-        
-        // Animação
-        setTimeout(() => {
-            msgDiv.style.transition = 'all 0.3s';
-            msgDiv.style.opacity = '1';
-            msgDiv.style.transform = 'translateX(0)';
-        }, 10);
-        
-        // Scroll
-        mensagensDiv.scrollTop = mensagensDiv.scrollHeight;
+        conversas.appendChild(msg);
+        conversas.scrollTop = conversas.scrollHeight;
     }
     
-    // ENVIAR MENSAGEM
-    function enviarMensagem() {
+    function enviar() {
         const texto = inputMsg.value.trim();
-        if (texto === '') return;
+        if (!texto) return;
         
-        // Salva no Firebase
+        // Salvar temporariamente
         database.ref('mensagens').push({
-            texto: texto,
-            quem: meuNome,
-            hora: Date.now()
+            txt: texto,
+            id: idUsuario,
+            t: Date.now()
         });
         
-        // Mostra localmente
-        adicionarMensagem(texto, meuNome, true);
+        // Mostrar localmente
+        adicionarMensagem(texto, true);
         
-        // Limpa input
+        // Limpar
         inputMsg.value = '';
         
-        // Para de mostrar "digitando"
-        database.ref('digitando/' + meuId).remove();
-        estouDigitando = false;
+        // Parar digitação
+        database.ref('digitando/' + idUsuario).remove();
+        digitandoAtivo = false;
         clearTimeout(timeoutDigitando);
+        
+        // Foco
+        inputMsg.focus();
     }
     
-    // DETECTAR DIGITAÇÃO
+    // Detectar digitação
     inputMsg.addEventListener('input', function() {
-        if (!estouDigitando) {
-            estouDigitando = true;
-            database.ref('digitando/' + meuId).set({
-                nome: meuNome,
-                ativo: true
+        if (!digitandoAtivo) {
+            digitandoAtivo = true;
+            database.ref('digitando/' + idUsuario).set({
+                a: true,
+                t: Date.now()
             });
         }
         
         clearTimeout(timeoutDigitando);
         timeoutDigitando = setTimeout(() => {
-            database.ref('digitando/' + meuId).remove();
-            estouDigitando = false;
-        }, 2000);
+            database.ref('digitando/' + idUsuario).remove();
+            digitandoAtivo = false;
+        }, 1500);
     });
     
-    // EVENT LISTENERS
-    
-    // Login
-    btnEntrar.addEventListener('click', entrarNoChat);
-    inputSenha.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') entrarNoChat();
+    // Eventos
+    btnAcessar.addEventListener('click', acessar);
+    inputCodigo.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') acessar();
     });
     
-    // Enviar mensagem
-    btnEnviar.addEventListener('click', enviarMensagem);
+    btnEnviar.addEventListener('click', enviar);
     inputMsg.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            enviarMensagem();
+            enviar();
         }
     });
     
-    // Foco na senha ao carregar
-    inputSenha.focus();
+    // Foco inicial
+    inputCodigo.focus();
     
-    // Touch events para melhor experiência mobile
-    document.addEventListener('touchstart', function() {}, {passive: true});
+    // Auto-limpeza ao iniciar
+    setTimeout(() => {
+        database.ref('mensagens').remove();
+    }, 1000);
 });
 </script>
 </body>
