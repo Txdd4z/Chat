@@ -5,11 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHAT ULTRA PRIVADO | FIREBASE PRO</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
 <style>
 * {
     margin: 0;
@@ -37,24 +34,6 @@ body {
     font-family: 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(10, 132, 255, 0.05) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(255, 42, 109, 0.05) 0%, transparent 20%);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes neonBorder {
-    0%, 100% { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-    50% { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
 }
 
 #login-screen {
@@ -69,11 +48,10 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    animation: fadeIn 0.8s ease-out;
 }
 
 .login-container {
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.9);
     border: 1px solid var(--amoled-border);
     border-radius: 20px;
     padding: 40px;
@@ -81,7 +59,6 @@ body {
     max-width: 400px;
     text-align: center;
     box-shadow: 0 0 50px rgba(10, 132, 255, 0.3);
-    animation: neonBorder 3s infinite alternate;
 }
 
 .login-title {
@@ -155,10 +132,6 @@ body {
     box-shadow: 0 10px 20px rgba(10, 132, 255, 0.4);
 }
 
-.login-btn:active {
-    transform: translateY(-1px);
-}
-
 .security-notice {
     margin-top: 20px;
     font-size: 0.8rem;
@@ -173,7 +146,6 @@ body {
     display: none;
     height: 100vh;
     flex-direction: column;
-    animation: fadeIn 0.5s ease-out;
 }
 
 .chat-header {
@@ -183,7 +155,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .header-left {
@@ -213,12 +184,6 @@ body {
     height: 8px;
     background: #00ff00;
     border-radius: 50%;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
 }
 
 .header-right {
@@ -252,9 +217,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background: 
-        radial-gradient(circle at 20% 30%, rgba(10, 132, 255, 0.03) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255, 42, 109, 0.03) 0%, transparent 40%);
+    background: #111;
 }
 
 #chat-box::-webkit-scrollbar {
@@ -274,8 +237,6 @@ body {
     max-width: 75%;
     padding: 15px 18px;
     border-radius: 18px;
-    position: relative;
-    animation: fadeIn 0.3s ease-out;
     line-height: 1.5;
     word-break: break-word;
 }
@@ -355,7 +316,6 @@ body {
 
 .emoji-btn:hover {
     color: var(--primary);
-    transform: translateY(-50%) scale(1.2);
 }
 
 #send-btn {
@@ -375,8 +335,7 @@ body {
 }
 
 #send-btn:hover {
-    transform: scale(1.1) rotate(15deg);
-    box-shadow: 0 8px 20px rgba(10, 132, 255, 0.5);
+    transform: scale(1.1);
 }
 
 .notification {
@@ -393,32 +352,11 @@ body {
     gap: 10px;
     z-index: 1000;
     transform: translateX(150%);
-    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: transform 0.5s;
 }
 
 .notification.show {
     transform: translateX(0);
-}
-
-.online-users {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    background: rgba(20, 20, 20, 0.95);
-    border: 1px solid var(--amoled-border);
-    border-radius: 10px;
-    padding: 10px 15px;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    display: none;
-}
-
-.typing-indicator {
-    padding: 10px 20px;
-    font-style: italic;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    display: none;
 }
 
 @media (max-width: 768px) {
@@ -442,10 +380,6 @@ body {
     .chat-input-area {
         padding: 15px;
     }
-    
-    #message-input {
-        padding: 15px 15px 15px 45px;
-    }
 }
 </style>
 </head>
@@ -453,27 +387,27 @@ body {
 
 <div id="login-screen">
     <div class="login-container">
-        <div style="margin-bottom: 20px; animation: float 3s ease-in-out infinite;">
+        <div style="margin-bottom: 20px;">
             <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary);"></i>
         </div>
         
-        <h1 class="login-title">CHAT FIREBASE PRO</h1>
-        <p class="login-subtitle">Conexão em tempo real • Histórico salvo • Multi-dispositivo</p>
+        <h1 class="login-title">CHAT FIREBASE</h1>
+        <p class="login-subtitle">Tempo real • Histórico salvo • Multi-dispositivo</p>
         
         <div class="password-wrapper">
-            <input type="password" id="password-input" class="password-input" placeholder="Digite a senha mestre" autocomplete="off">
+            <input type="password" id="password-input" class="password-input" placeholder="Digite a senha">
             <button class="toggle-password" id="toggle-password">
                 <i class="fas fa-eye"></i>
             </button>
         </div>
         
         <button class="login-btn" id="login-btn">
-            <i class="fas fa-terminal"></i> ACESSAR SISTEMA
+            <i class="fas fa-terminal"></i> ENTRAR NO CHAT
         </button>
         
         <div class="security-notice">
             <i class="fas fa-database"></i>
-            <span>Conectando ao Firebase Realtime Database...</span>
+            <span>Conectando ao Firebase...</span>
         </div>
     </div>
 </div>
@@ -485,7 +419,7 @@ body {
                 <i class="fas fa-user-astronaut" style="font-size: 2rem; color: var(--primary);"></i>
             </div>
             <div class="user-info">
-                <h2>Chat Firebase 🔥</h2>
+                <h2>Chat em Tempo Real 🔥</h2>
                 <div class="user-status">
                     <div class="status-dot"></div>
                     <span id="connection-status">Conectando...</span>
@@ -494,16 +428,13 @@ body {
         </div>
         
         <div class="header-right">
-            <div class="online-users" id="online-users">
-                <i class="fas fa-users"></i> <span id="online-count">1</span> online
-            </div>
-            <button class="header-btn" id="theme-btn" title="Alternar tema">
+            <button class="header-btn" id="theme-btn">
                 <i class="fas fa-palette"></i>
             </button>
-            <button class="header-btn" id="clear-btn" title="Limpar chat">
+            <button class="header-btn" id="clear-btn">
                 <i class="fas fa-broom"></i>
             </button>
-            <button class="header-btn" id="info-btn" title="Informações">
+            <button class="header-btn" id="info-btn">
                 <i class="fas fa-info"></i>
             </button>
         </div>
@@ -511,13 +442,9 @@ body {
     
     <div id="chat-box">
         <div class="message her">
-            <div class="message-text">Conectando ao servidor Firebase... 🔥</div>
+            <div class="message-text">Conectando ao servidor...</div>
             <div class="message-time">--:--:--</div>
         </div>
-    </div>
-    
-    <div id="typing-indicator" class="typing-indicator">
-        <span id="typing-text"></span>
     </div>
     
     <div class="chat-input-area">
@@ -535,25 +462,18 @@ body {
 
 <div id="notification" class="notification">
     <i class="fas fa-bell" style="color: var(--primary);"></i>
-    <span id="notification-text">Nova mensagem recebida</span>
+    <span id="notification-text">Nova mensagem!</span>
 </div>
 
 <script>
-// Firebase Configuration - SUA CONEXÃO AQUI
+// Configuração do Firebase - SEU LINK
 const firebaseConfig = {
     databaseURL: "https://chat-5d4cd-default-rtdb.firebaseio.com/"
 };
 
-// Initialize Firebase
+// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-
-// Variáveis globais
-let currentUser = null;
-let userId = null;
-let isTyping = false;
-let typingTimeout = null;
-const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯', '👀'];
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos
@@ -572,40 +492,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const notification = document.getElementById('notification');
     const notificationText = document.getElementById('notification-text');
     const connectionStatus = document.getElementById('connection-status');
-    const onlineUsers = document.getElementById('online-users');
-    const onlineCount = document.getElementById('online-count');
-    const typingIndicator = document.getElementById('typing-indicator');
-    const typingText = document.getElementById('typing-text');
     
-    // Gerar ID único para o usuário
-    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // Variáveis
+    let currentUser = null;
+    let userId = null;
+    const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯'];
     
-    // Função de login
+    // Função de login - CORRIGIDA
     function checkPassword() {
         const password = passwordInput.value;
         const validPasswords = ['0306', 'amor', 'privado', 'admin', 'senha', 'firebase'];
         
+        console.log('Senha digitada:', password); // Debug
+        console.log('Senhas válidas:', validPasswords); // Debug
+        
         if (validPasswords.includes(password)) {
+            console.log('Senha correta!'); // Debug
+            
             currentUser = 'Usuário_' + Math.floor(Math.random() * 1000);
+            userId = 'user_' + Date.now();
             
-            // Atualizar status online
-            database.ref('online/' + userId).set({
-                name: currentUser,
-                lastSeen: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            // Remover usuário quando desconectar
-            window.addEventListener('beforeunload', function() {
-                database.ref('online/' + userId).remove();
-            });
-            
+            // Mostrar transição
             loginScreen.style.opacity = '0';
             loginScreen.style.transition = 'opacity 0.5s';
             
             setTimeout(() => {
                 loginScreen.style.display = 'none';
                 chatContainer.style.display = 'flex';
-                showNotification(`Bem-vindo, ${currentUser}!`, 'success');
                 
                 // Habilitar inputs
                 messageInput.disabled = false;
@@ -617,25 +530,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Escutar novas mensagens
                 listenForMessages();
                 
-                // Escutar usuários online
-                listenForOnlineUsers();
-                
-                // Escutar digitação
-                listenForTyping();
-                
+                // Foco no input
                 messageInput.focus();
+                
+                showNotification('Conectado! Bem-vindo!', 'success');
             }, 500);
         } else {
+            console.log('Senha incorreta!'); // Debug
+            
             passwordInput.style.borderColor = '#ff2a6d';
             passwordInput.style.boxShadow = '0 0 15px rgba(255, 42, 109, 0.5)';
             passwordInput.value = '';
-            passwordInput.placeholder = 'Senha incorreta!';
+            passwordInput.placeholder = 'Senha incorreta! Tente: 0306';
             
             setTimeout(() => {
                 passwordInput.style.borderColor = '';
                 passwordInput.style.boxShadow = '';
-                passwordInput.placeholder = 'Digite a senha mestre';
-            }, 1500);
+                passwordInput.placeholder = 'Digite a senha';
+            }, 2000);
         }
     }
     
@@ -673,24 +585,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="message-time">${timeString}</div>
         `;
         
-        messageDiv.style.opacity = '0';
-        messageDiv.style.transform = isYou ? 'translateX(20px)' : 'translateX(-20px)';
-        
         chatBox.appendChild(messageDiv);
-        
-        setTimeout(() => {
-            messageDiv.style.transition = 'all 0.3s ease-out';
-            messageDiv.style.opacity = '1';
-            messageDiv.style.transform = 'translateX(0)';
-        }, 10);
-        
         chatBox.scrollTop = chatBox.scrollHeight;
         
         if (!isYou) {
             showNotification('Nova mensagem!', 'info');
-            if (document.hidden) {
-                document.title = '💬 Nova mensagem!';
-            }
         }
     }
     
@@ -698,35 +597,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const text = messageInput.value.trim();
         if (!text) return;
         
-        // Salvar no Firebase
         const messageData = {
             text: text,
-            sender: currentUser,
-            userId: userId,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
+            sender: currentUser || 'Anônimo',
+            timestamp: Date.now()
         };
         
+        // Salvar no Firebase
         database.ref('messages').push(messageData)
             .then(() => {
-                // Mostrar localmente
                 addMessage(text, currentUser, true);
                 messageInput.value = '';
-                
-                // Parar de digitar
-                database.ref('typing/' + userId).remove();
-                isTyping = false;
-                clearTimeout(typingTimeout);
-                
                 messageInput.focus();
             })
             .catch(error => {
-                console.error('Erro ao enviar mensagem:', error);
-                showNotification('Erro ao enviar mensagem!', 'error');
+                console.error('Erro ao enviar:', error);
+                showNotification('Erro ao enviar!', 'error');
             });
     }
     
     function loadMessages() {
-        database.ref('messages').limitToLast(50).once('value')
+        database.ref('messages').limitToLast(20).once('value')
             .then((snapshot) => {
                 const messages = snapshot.val();
                 if (messages) {
@@ -737,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const messagesArray = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
                     
                     messagesArray.forEach(msg => {
-                        const isYou = msg.userId === userId;
+                        const isYou = msg.sender === currentUser;
                         addMessage(msg.text, msg.sender, isYou);
                     });
                     
@@ -749,79 +640,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function listenForMessages() {
         database.ref('messages').limitToLast(1).on('child_added', (snapshot) => {
             const msg = snapshot.val();
-            // Não mostrar a própria mensagem novamente
-            if (msg.userId !== userId) {
+            if (msg.sender !== currentUser) {
                 addMessage(msg.text, msg.sender, false);
             }
         });
     }
     
-    function listenForOnlineUsers() {
-        database.ref('online').on('value', (snapshot) => {
-            const users = snapshot.val();
-            if (users) {
-                const count = Object.keys(users).length;
-                onlineCount.textContent = count;
-                onlineUsers.style.display = 'block';
-                
-                // Atualizar status
-                database.ref('online/' + userId).update({
-                    lastSeen: firebase.database.ServerValue.TIMESTAMP
-                });
-                
-                // Remover usuários inativos (últimos 30 segundos)
-                const now = Date.now();
-                Object.entries(users).forEach(([key, user]) => {
-                    if (now - user.lastSeen > 30000) {
-                        database.ref('online/' + key).remove();
-                    }
-                });
-            }
-        });
-    }
-    
-    function listenForTyping() {
-        database.ref('typing').on('value', (snapshot) => {
-            const typingUsers = snapshot.val();
-            if (typingUsers) {
-                const currentTyping = Object.entries(typingUsers)
-                    .filter(([key, user]) => key !== userId && user.name !== currentUser)
-                    .map(([key, user]) => user.name);
-                
-                if (currentTyping.length > 0) {
-                    typingText.textContent = currentTyping[0] + ' está digitando...';
-                    typingIndicator.style.display = 'block';
-                } else {
-                    typingIndicator.style.display = 'none';
-                }
-            } else {
-                typingIndicator.style.display = 'none';
-            }
-        });
-    }
-    
-    // Detectar digitação
-    messageInput.addEventListener('input', function() {
-        if (!isTyping) {
-            isTyping = true;
-            database.ref('typing/' + userId).set({
-                name: currentUser,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-        }
-        
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            database.ref('typing/' + userId).remove();
-            isTyping = false;
-        }, 2000);
-    });
-    
     // Event Listeners do chat
     sendBtn.addEventListener('click', sendMessage);
     
     messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter') {
             e.preventDefault();
             sendMessage();
         }
@@ -831,29 +660,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const randomEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
         messageInput.value += randomEmoji;
         messageInput.focus();
-        
-        this.style.transform = 'translateY(-50%) scale(1.5)';
-        setTimeout(() => {
-            this.style.transform = 'translateY(-50%) scale(1)';
-        }, 200);
     });
     
     clearBtn.addEventListener('click', function() {
-        if (confirm('Limpar todo o histórico do chat?\nIsso apagará do servidor também!')) {
-            database.ref('messages').remove()
-                .then(() => {
-                    chatBox.innerHTML = `
-                        <div class="message her">
-                            <div class="message-text">Histórico de conversa limpo. 🔄</div>
-                            <div class="message-time">${new Date().toLocaleTimeString()}</div>
-                        </div>
-                    `;
-                    showNotification('Chat limpo com sucesso!', 'success');
-                })
-                .catch(error => {
-                    console.error('Erro ao limpar chat:', error);
-                    showNotification('Erro ao limpar chat!', 'error');
-                });
+        if (confirm('Limpar histórico local?')) {
+            chatBox.innerHTML = `
+                <div class="message her">
+                    <div class="message-text">Chat limpo. As mensagens ainda estão no servidor.</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                </div>
+            `;
+            showNotification('Chat limpo!', 'success');
         }
     });
     
@@ -881,24 +698,21 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.setProperty('--primary', colors.primary);
         document.documentElement.style.setProperty('--amoled-bg', colors.bg);
         
-        this.innerHTML = `<i class="fas fa-${nextTheme === 'matrix' ? 'code' : nextTheme === 'sunset' ? 'sun' : 'moon'}"></i>`;
-        showNotification(`Tema: ${nextTheme.toUpperCase()}`, 'info');
+        showNotification(`Tema: ${nextTheme}`, 'info');
     });
     
     infoBtn.addEventListener('click', function() {
-        alert(`CHAT FIREBASE PRO v3.0
+        alert(`CHAT FIREBASE v1.0
 
-• Conexão em tempo real
+• Mensagens em tempo real
 • Histórico salvo no Firebase
-• Multi-usuário online
-• Indicação de digitação
-• Notificações em tempo real
+• Funciona em qualquer dispositivo
+• Design AMOLED premium
 
-Servidor: chat-5d4cd-default-rtdb.firebaseio.com
-Usuário: ${currentUser || 'Não conectado'}
-ID: ${userId}
+Senhas válidas: 
+0306, amor, privado, admin, senha, firebase
 
-Senhas válidas: 0306, amor, privado, admin, senha, firebase`);
+Servidor: chat-5d4cd-default-rtdb.firebaseio.com`);
     });
     
     function showNotification(text, type) {
@@ -919,27 +733,17 @@ Senhas válidas: 0306, amor, privado, admin, senha, firebase`);
         }, 3000);
     }
     
-    // Foco no campo de senha
-    passwordInput.focus();
-    
-    // Atualizar título da página
-    let originalTitle = document.title;
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            document.title = originalTitle;
-        }
-    });
-    
     // Verificar conexão Firebase
     database.ref('.info/connected').on('value', (snapshot) => {
         if (snapshot.val() === true) {
             connectionStatus.textContent = 'Conectado ao Firebase';
-            connectionStatus.style.color = '#00ff00';
         } else {
             connectionStatus.textContent = 'Desconectado';
-            connectionStatus.style.color = '#ff2a6d';
         }
     });
+    
+    // Foco no campo de senha
+    passwordInput.focus();
 });
 </script>
 </body>
