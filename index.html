@@ -1,646 +1,508 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHAT ULTRA PRIVADO | AMOLED PRO</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-:root {
-    --primary: #0a84ff;
-    --primary-glow: #0a84ffaa;
-    --secondary: #ff2a6d;
-    --amoled-bg: #000000;
-    --amoled-card: #111111;
-    --amoled-border: #222222;
-    --neon-blue: #00f3ff;
-    --neon-pink: #ff00ff;
-    --text: #ffffff;
-    --text-secondary: #888888;
-}
-
-body {
-    background: var(--amoled-bg);
-    color: var(--text);
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-#login-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.login-container {
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid var(--amoled-border);
-    border-radius: 20px;
-    padding: 40px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 0 50px rgba(10, 132, 255, 0.3);
-}
-
-.login-title {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    background: linear-gradient(90deg, var(--primary), var(--neon-pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.login-subtitle {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-    font-size: 1rem;
-}
-
-.password-wrapper {
-    position: relative;
-    width: 100%;
-    margin: 25px 0;
-}
-
-.password-input {
-    width: 100%;
-    padding: 18px 20px;
-    padding-right: 50px;
-    font-size: 1.2rem;
-    background: rgba(20, 20, 20, 0.8);
-    border: 2px solid var(--amoled-border);
-    border-radius: 12px;
-    color: white;
-    outline: none;
-    transition: all 0.3s;
-}
-
-.password-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 20px var(--primary-glow);
-}
-
-.toggle-password {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-.login-btn {
-    width: 100%;
-    padding: 18px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
-    letter-spacing: 1px;
-}
-
-.login-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(10, 132, 255, 0.4);
-}
-
-.security-notice {
-    margin-top: 20px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-#chat-container {
-    display: none;
-    height: 100vh;
-    flex-direction: column;
-}
-
-.chat-header {
-    background: rgba(10, 10, 10, 0.95);
-    border-bottom: 1px solid var(--amoled-border);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.user-info h2 {
-    font-size: 1.5rem;
-    background: linear-gradient(90deg, var(--primary), var(--neon-blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.user-status {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    background: #00ff00;
-    border-radius: 50%;
-}
-
-.header-right {
-    display: flex;
-    gap: 15px;
-}
-
-.header-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.header-btn:hover {
-    background: var(--primary);
-    transform: rotate(15deg);
-}
-
-#chat-box {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-#chat-box::-webkit-scrollbar {
-    width: 6px;
-}
-
-#chat-box::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#chat-box::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 3px;
-}
-
-.message {
-    max-width: 75%;
-    padding: 15px 18px;
-    border-radius: 18px;
-    line-height: 1.5;
-    word-break: break-word;
-}
-
-.message.you {
-    align-self: flex-end;
-    background: linear-gradient(135deg, var(--primary), #0066cc);
-    color: white;
-    border-bottom-right-radius: 5px;
-    box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);
-}
-
-.message.her {
-    align-self: flex-start;
-    background: rgba(30, 30, 30, 0.9);
-    border: 1px solid var(--amoled-border);
-    color: white;
-    border-bottom-left-radius: 5px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.message-time {
-    font-size: 0.7rem;
-    opacity: 0.7;
-    margin-top: 5px;
-    text-align: right;
-}
-
-.message.her .message-time {
-    text-align: left;
-}
-
-.chat-input-area {
-    background: rgba(10, 10, 10, 0.95);
-    border-top: 1px solid var(--amoled-border);
-    padding: 20px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.input-wrapper {
-    flex: 1;
-    position: relative;
-}
-
-#message-input {
-    width: 100%;
-    padding: 18px 20px;
-    padding-right: 50px;
-    background: rgba(20, 20, 20, 0.9);
-    border: 2px solid var(--amoled-border);
-    border-radius: 15px;
-    color: white;
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s;
-}
-
-#message-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 15px var(--primary-glow);
-}
-
-.emoji-btn {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.emoji-btn:hover {
-    color: var(--primary);
-}
-
-#send-btn {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none;
-    color: white;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);
-}
-
-#send-btn:hover {
-    transform: scale(1.1);
-}
-
-.notification {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    background: rgba(20, 20, 20, 0.95);
-    border-left: 4px solid var(--primary);
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 1000;
-    transform: translateX(150%);
-    transition: transform 0.5s;
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-@media (max-width: 768px) {
-    .login-container {
-        padding: 30px 20px;
-        width: 95%;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAT PRIVADO 🔥</title>
     
-    .login-title {
-        font-size: 2rem;
-    }
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
-    .message {
-        max-width: 85%;
-    }
-    
-    .chat-header {
-        padding: 12px 15px;
-    }
-    
-    .chat-input-area {
-        padding: 15px;
-    }
-}
-</style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* TELA DE CONEXÃO */
+        #connection-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .connection-box {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid #ff2a6d;
+        }
+        
+        .connection-box h1 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .user-select {
+            margin: 20px 0;
+        }
+        
+        .user-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 200px;
+        }
+        
+        .user-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* ÁREA DO CHAT */
+        #chat-area {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #111;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.voce {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.ela {
+            background: #222;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #333;
+        }
+        
+        .message-sender {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .message.ela .message-time {
+            text-align: left;
+        }
+        
+        .chat-input-area {
+            background: #222;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #message-input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 25px;
+            border: 2px solid #333;
+            background: #111;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        #message-input:focus {
+            border-color: #667eea;
+        }
+        
+        #send-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #send-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* TYPING INDICATOR */
+        .typing {
+            padding: 10px;
+            font-style: italic;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        /* NOTIFICATION */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transform: translateX(150%);
+            transition: transform 0.5s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
 </head>
 <body>
-<div id="login-screen">
-    <div class="login-container">
-        <div style="margin-bottom: 20px;">
-            <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary);"></i>
-        </div>
-        <h1 class="login-title">CHAT ULTRA PRIVADO</h1>
-        <p class="login-subtitle">Acesso exclusivo • Criptografia local</p>
-        <div class="password-wrapper">
-            <input type="password" id="password-input" class="password-input" placeholder="Digite a senha mestre">
-            <button class="toggle-password" id="toggle-password">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
-        <button class="login-btn" id="login-btn">
-            <i class="fas fa-terminal"></i> ACESSAR SISTEMA
-        </button>
-        <div class="security-notice">
-            <i class="fas fa-shield-alt"></i>
-            <span>Este dispositivo não armazena logs de conversa</span>
-        </div>
-    </div>
-</div>
-
-<div id="chat-container">
-    <div class="chat-header">
-        <div class="header-left">
-            <div class="avatar">
-                <i class="fas fa-user-astronaut" style="font-size: 2rem; color: var(--primary);"></i>
+    <!-- TELA DE CONEXÃO -->
+    <div id="connection-screen">
+        <div class="connection-box">
+            <h1>💬 CHAT PRIVADO</h1>
+            <p style="color: #ccc; margin-bottom: 30px;">Conecte-se para conversar em tempo real</p>
+            
+            <div class="user-select">
+                <p style="color: #ff2a6d; margin-bottom: 15px; font-weight: bold;">Quem está usando?</p>
+                <button class="user-btn" onclick="connectAs('VOCÊ')">
+                    👤 SIX
+                </button>
+                <button class="user-btn" onclick="connectAs('ELA')">
+                    👩 VI
+                </button>
             </div>
-            <div class="user-info">
-                <h2>Conversa Privada 🔒</h2>
-                <div class="user-status">
-                    <div class="status-dot"></div>
-                    <span>Conexão segura</span>
-                </div>
+            
+            <div style="margin-top: 30px; color: #888; font-size: 0.9rem;">
+                <p>🔗 Conectando ao servidor privado...</p>
+                <p id="connection-status" style="margin-top: 10px;">Aguardando seleção...</p>
             </div>
         </div>
-        <div class="header-right">
-            <button class="header-btn" id="theme-btn">
-                <i class="fas fa-palette"></i>
-            </button>
-            <button class="header-btn" id="clear-btn">
-                <i class="fas fa-broom"></i>
-            </button>
-            <button class="header-btn" id="info-btn">
-                <i class="fas fa-info"></i>
-            </button>
-        </div>
     </div>
     
-    <div id="chat-box">
-        <div class="message her">
-            <div class="message-text">Sistema iniciado. Conexão segura estabelecida. 🔐</div>
-            <div class="message-time">23:41:05</div>
-        </div>
-        <div class="message her">
-            <div class="message-text">Use este canal para comunicação privada.</div>
-            <div class="message-time">23:41:10</div>
-        </div>
-    </div>
-    
-    <div class="chat-input-area">
-        <div class="input-wrapper">
-            <input type="text" id="message-input" placeholder="Digite sua mensagem...">
-            <button class="emoji-btn" id="emoji-btn">
-                <i class="fas fa-smile"></i>
-            </button>
-        </div>
-        <button id="send-btn">
-            <i class="fas fa-paper-plane"></i>
-        </button>
-    </div>
-</div>
-
-<div id="notification" class="notification">
-    <i class="fas fa-bell" style="color: var(--primary);"></i>
-    <span id="notification-text">Nova mensagem recebida</span>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const loginBtn = document.getElementById('login-btn');
-    const passwordInput = document.getElementById('password-input');
-    const togglePassword = document.getElementById('toggle-password');
-    const loginScreen = document.getElementById('login-screen');
-    const chatContainer = document.getElementById('chat-container');
-    const sendBtn = document.getElementById('send-btn');
-    const messageInput = document.getElementById('message-input');
-    const chatBox = document.getElementById('chat-box');
-    const emojiBtn = document.getElementById('emoji-btn');
-    const clearBtn = document.getElementById('clear-btn');
-    const themeBtn = document.getElementById('theme-btn');
-    const infoBtn = document.getElementById('info-btn');
-    const notification = document.getElementById('notification');
-    const notificationText = document.getElementById('notification-text');
-    
-    const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯', '👀'];
-    let currentTheme = 'amoled';
-    
-    function checkPassword() {
-        const password = passwordInput.value;
-        const validPasswords = ['0306', 'amor', 'privado', 'admin'];
-        
-        if (validPasswords.includes(password)) {
-            loginScreen.style.opacity = '0';
-            loginScreen.style.transition = 'opacity 0.5s';
-            
-            setTimeout(() => {
-                loginScreen.style.display = 'none';
-                chatContainer.style.display = 'flex';
-                showNotification('Sistema desbloqueado!', 'success');
-                messageInput.focus();
-            }, 500);
-        } else {
-            passwordInput.style.borderColor = '#ff2a6d';
-            passwordInput.style.boxShadow = '0 0 15px rgba(255, 42, 109, 0.5)';
-            passwordInput.value = '';
-            passwordInput.placeholder = 'Senha incorreta!';
-            
-            setTimeout(() => {
-                passwordInput.style.borderColor = '';
-                passwordInput.style.boxShadow = '';
-                passwordInput.placeholder = 'Digite a senha mestre';
-            }, 1500);
-        }
-    }
-    
-    loginBtn.addEventListener('click', checkPassword);
-    
-    passwordInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            checkPassword();
-        }
-    });
-    
-    togglePassword.addEventListener('click', function() {
-        const icon = this.querySelector('i');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.className = 'fas fa-eye-slash';
-        } else {
-            passwordInput.type = 'password';
-            icon.className = 'fas fa-eye';
-        }
-    });
-    
-    function addMessage(text, sender) {
-        const messageDiv = document.createElement('div');
-        const now = new Date();
-        const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
-                          now.getMinutes().toString().padStart(2, '0') + ':' + 
-                          now.getSeconds().toString().padStart(2, '0');
-        
-        messageDiv.className = `message ${sender}`;
-        messageDiv.innerHTML = `
-            <div class="message-text">${text}</div>
-            <div class="message-time">${timeString}</div>
-        `;
-        
-        messageDiv.style.opacity = '0';
-        chatBox.appendChild(messageDiv);
-        
-        setTimeout(() => {
-            messageDiv.style.transition = 'opacity 0.3s';
-            messageDiv.style.opacity = '1';
-        }, 10);
-        
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-    
-    function sendMessage() {
-        const text = messageInput.value.trim();
-        if (text) {
-            addMessage(text, 'you');
-            messageInput.value = '';
-            
-            setTimeout(() => {
-                const replies = [
-                    'Recebi sua mensagem!',
-                    'Interessante...',
-                    'Continue falando!',
-                    'Isso é confidencial! 🔐',
-                    'Entendido!',
-                    'Mensagem recebida com sucesso!'
-                ];
-                const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                addMessage(randomReply, 'her');
-                showNotification('Nova mensagem recebida', 'info');
-            }, 500 + Math.random() * 1000);
-        }
-    }
-    
-    sendBtn.addEventListener('click', sendMessage);
-    
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-    
-    emojiBtn.addEventListener('click', function() {
-        const randomEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-        messageInput.value += randomEmoji;
-        messageInput.focus();
-    });
-    
-    clearBtn.addEventListener('click', function() {
-        if (confirm('Limpar todo o histórico de conversa?')) {
-            chatBox.innerHTML = `
-                <div class="message her">
-                    <div class="message-text">Histórico de conversa limpo. 🔄</div>
-                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+    <!-- ÁREA DO CHAT -->
+    <div id="chat-area">
+        <div class="chat-header">
+            <div>
+                <h2 style="color: white;">CHAT PRIVADO 💕</h2>
+                <div class="status">
+                    <div class="online-dot"></div>
+                    <span id="connection-info">Conectado</span>
                 </div>
-            `;
-            showNotification('Chat limpo com sucesso', 'success');
-        }
-    });
+            </div>
+            <div class="user-badge" id="current-user-badge">VOCÊ</div>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <!-- Mensagens aparecerão aqui -->
+            <div class="message ela">
+                <div class="message-sender">ELA</div>
+                <div>Chat conectado! Diga algo... 💬</div>
+                <div class="message-time" id="current-time"></div>
+            </div>
+        </div>
+        
+        <div id="typing-indicator" class="typing" style="display: none;">
+            <span id="typing-user">ELA</span> está digitando...
+        </div>
+        
+        <div class="chat-input-area">
+            <input type="text" id="message-input" placeholder="Digite sua mensagem..." autocomplete="off">
+            <button id="send-btn">➤</button>
+        </div>
+    </div>
     
-    themeBtn.addEventListener('click', function() {
-        const themes = ['amoled', 'matrix', 'sunset'];
-        const themeColors = {
-            'amoled': { primary: '#0a84ff', bg: '#000000' },
-            'matrix': { primary: '#00ff41', bg: '#0a0a0a' },
-            'sunset': { primary: '#ff2a6d', bg: '#0a0a2a' }
+    <!-- NOTIFICAÇÃO -->
+    <div id="notification" class="notification">
+        <span id="notification-text">Nova mensagem!</span>
+    </div>
+    
+    <script>
+        // Configuração do Firebase - SEU LINK AQUI
+        const firebaseConfig = {
+            databaseURL: "https://chat-5d4cd-default-rtdb.firebaseio.com/"
         };
         
-        currentTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
-        const colors = themeColors[currentTheme];
+        // Variáveis globais
+        let currentUser = '';
+        let firebaseInitialized = false;
         
-        document.documentElement.style.setProperty('--primary', colors.primary);
-        document.documentElement.style.setProperty('--amoled-bg', colors.bg);
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
         
-        showNotification(`Tema: ${currentTheme.toUpperCase()}`, 'info');
-    });
-    
-    infoBtn.addEventListener('click', function() {
-        alert('CHAT ULTRA PRIVADO v2.0\n\n• Criptografia local\n• Sem armazenamento de logs\n• Comunicação segura\n\nDesenvolvido para privacidade total.');
-    });
-    
-    function showNotification(text, type) {
-        notificationText.textContent = text;
-        
-        if (type === 'success') {
-            notification.style.borderLeftColor = '#00ff00';
-        } else if (type === 'error') {
-            notification.style.borderLeftColor = '#ff2a6d';
-        } else {
-            notification.style.borderLeftColor = 'var(--primary)';
+        // Função para conectar como usuário
+        function connectAs(user) {
+            currentUser = user;
+            document.getElementById('current-user-badge').textContent = user;
+            document.getElementById('connection-status').textContent = `Conectando como ${user}...`;
+            document.getElementById('connection-status').style.color = '#00ff00';
+            
+            setTimeout(() => {
+                document.getElementById('connection-screen').style.display = 'none';
+                document.getElementById('chat-area').style.display = 'flex';
+                document.getElementById('message-input').focus();
+                
+                // Atualizar tempo atual
+                updateCurrentTime();
+                setInterval(updateCurrentTime, 60000);
+                
+                // Carregar mensagens antigas
+                loadMessages();
+                
+                // Escutar novas mensagens
+                listenForMessages();
+                
+                // Escutar typing
+                listenForTyping();
+            }, 1000);
         }
         
-        notification.classList.add('show');
+        // Atualizar horário atual
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                             now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('current-time').textContent = timeString;
+        }
         
-        setTimeout(() => {
-            notification.classList.remove('show');
-        }, 3000);
-    }
-    
-    passwordInput.focus();
-});
-</script>
+        // Carregar mensagens do Firebase
+        function loadMessages() {
+            database.ref('messages').limitToLast(20).once('value').then((snapshot) => {
+                const messages = snapshot.val();
+                if (messages) {
+                    Object.values(messages).forEach(msg => {
+                        displayMessage(msg.text, msg.sender);
+                    });
+                }
+            });
+        }
+        
+        // Escutar novas mensagens em tempo real
+        function listenForMessages() {
+            database.ref('messages').limitToLast(1).on('child_added', (snapshot) => {
+                const msg = snapshot.val();
+                // Só exibir se não for a própria mensagem que acabou de enviar
+                if (msg.sender !== currentUser) {
+                    displayMessage(msg.text, msg.sender);
+                    showNotification(`${msg.sender}: ${msg.text}`);
+                    
+                    // Efeito sonoro de notificação
+                    playNotificationSound();
+                }
+            });
+        }
+        
+        // Escutar typing
+        function listenForTyping() {
+            database.ref('typing').on('value', (snapshot) => {
+                const typingData = snapshot.val();
+                const typingIndicator = document.getElementById('typing-indicator');
+                
+                if (typingData && typingData.user && typingData.user !== currentUser && typingData.isTyping) {
+                    document.getElementById('typing-user').textContent = typingData.user;
+                    typingIndicator.style.display = 'block';
+                } else {
+                    typingIndicator.style.display = 'none';
+                }
+            });
+        }
+        
+        // Enviar mensagem
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            
+            if (text === '') return;
+            
+            const messageData = {
+                text: text,
+                sender: currentUser,
+                timestamp: Date.now()
+            };
+            
+            // Salvar no Firebase
+            database.ref('messages').push(messageData);
+            
+            // Exibir localmente
+            displayMessage(text, currentUser);
+            
+            // Limpar input
+            input.value = '';
+            
+            // Parar de mostrar "digitando"
+            database.ref('typing').set({
+                user: currentUser,
+                isTyping: false
+            });
+        }
+        
+        // Exibir mensagem no chat
+        function displayMessage(text, sender) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                             now.getMinutes().toString().padStart(2, '0');
+            
+            messageDiv.className = `message ${sender === currentUser ? 'voce' : 'ela'}`;
+            messageDiv.innerHTML = `
+                <div class="message-sender">${sender}</div>
+                <div>${text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            
+            // Scroll automático
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            // Animação
+            messageDiv.style.animation = 'fadeIn 0.3s';
+        }
+        
+        // Mostrar notificação
+        function showNotification(text) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = text;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Efeito sonoro de notificação
+        function playNotificationSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (e) {
+                console.log("Audio não suportado");
+            }
+        }
+        
+        // Detectar quando o usuário está digitando
+        let typingTimeout;
+        document.getElementById('message-input').addEventListener('input', function() {
+            database.ref('typing').set({
+                user: currentUser,
+                isTyping: true
+            });
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                database.ref('typing').set({
+                    user: currentUser,
+                    isTyping: false
+                });
+            }, 1000);
+        });
+        
+        // Event Listeners
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Inicializar
+        updateCurrentTime();
+    </script>
 </body>
-        </html>
+</html>
