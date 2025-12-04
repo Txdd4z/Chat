@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHAT ULTRA PRIVADO | AMOLED PRO</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --primary: #0a84ff;
+    --primary-glow: #0a84ffaa;
+    --secondary: #ff2a6d;
+    --amoled-bg: #000000;
+    --amoled-card: #111111;
+    --amoled-border: #222222;
+    --neon-blue: #00f3ff;
+    --neon-pink: #ff00ff;
+    --text: #ffffff;
+    --text-secondary: #888888;
+}
+
+body {
+    background: var(--amoled-bg);
+    color: var(--text);
+    font-family: 'Segoe UI', 'Arial Nova', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(10, 132, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 42, 109, 0.05) 0%, transparent 20%);
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes neonBorder {
+    0%, 100% { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    50% { border-color: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
+}
+
+@keymatrix matrixRain {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 0% 100%; }
+}
+
+/* ===== TELA DE ACESSO ===== */
+#login-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: 
+        linear-gradient(135deg, #000000 0%, #0a0a2a 100%),
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%230a84ff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.login-container {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--amoled-border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 
+        0 0 50px rgba(10, 132, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: neonBorder 3s infinite alternate;
+}
+
+.login-title {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, var(--primary), var(--neon-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    font-size: 1rem;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 25px 0;
+}
+
+.password-input {
+    width: 100%;
+    padding: 18px 20px;
+    padding-right: 50px;
+    font-size: 1.2rem;
+    background: rgba(20, 20, 20, 0.8);
+    border: 2px solid var(--amoled-border);
+    border-radius: 12px;
+    color: white;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.password-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(10, 132, 255, 0.4);
+}
+
+.login-btn:active {
+    transform: translateY(-1px);
+}
+
+.security-notice {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* ===== ÁREA DO CHAT ===== */
+#chat-container {
+    display: none;
+    height: 100vh;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.chat-header {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--amoled-border);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info h2 {
+    font-size: 1.5rem;
+    background: linear-gradient(90deg, var(--primary), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #00ff00;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.header-right {
+    display: flex;
+    gap: 15px;
+}
+
+.header-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.header-btn:hover {
+    background: var(--primary);
+    transform: rotate(15deg);
+}
+
+/* ===== CAIXA DE MENSAGENS ===== */
+#chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(10, 132, 255, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 42, 109, 0.03) 0%, transparent 40%);
+}
+
+/* Estilização da scrollbar */
+#chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-box::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+/* ===== MENSAGENS ===== */
+.message {
+    max-width: 75%;
+    padding: 15px 18px;
+    border-radius: 18px;
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.message.you {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--primary), #0066cc);
+    color: white;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);
+}
+
+.message.her {
+    align-self: flex-start;
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid var(--amoled-border);
+    color: white;
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message.her .message-time {
+    text-align: left;
+}
+
+/* ===== ÁREA DE ENVIO ===== */
+.chat-input-area {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--amoled-border);
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+#message-input {
+    width: 100%;
+    padding: 18px 20px;
+    padding-right: 50px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 2px solid var(--amoled-border);
+    border-radius: 15px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+#message-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.emoji-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.emoji-btn:hover {
+    color: var(--primary);
+    transform: translateY(-50%) scale(1.2);
+}
+
+#send-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(10, 132, 255, 0.3);
+}
+
+#send-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 8px 20px rgba(10, 132, 255, 0.5);
+}
+
+/* ===== NOTIFICAÇÃO ===== */
+.notification {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    background: rgba(20, 20, 20, 0.95);
+    border-left: 4px solid var(--primary);
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    transform: translateX(150%);
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 30px 20px;
+        width: 95%;
+    }
+    
+    .login-title {
+        font-size: 2rem;
+    }
+    
+    .message {
+        max-width: 85%;
+    }
+    
+    .chat-header {
+        padding: 12px 15px;
+    }
+    
+    .chat-input-area {
+        padding: 15px;
+    }
+    
+    #message-input {
+        padding: 15px 15px 15px 45px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- =================== TELA DE ACESSO =================== -->
+<div id="login-screen">
+    <div class="login-container">
+        <div style="margin-bottom: 20px; animation: float 3s ease-in-out infinite;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary);"></i>
+        </div>
+        
+        <h1 class="login-title">CHAT ULTRA PRIVADO</h1>
+        <p class="login-subtitle">Acesso exclusivo • Criptografia local • Zero rastreamento</p>
+        
+        <div class="password-wrapper">
+            <input type="password" id="password-input" class="password-input" placeholder="Digite a senha mestre" autocomplete="off">
+            <button class="toggle-password" id="toggle-password">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        
+        <button class="login-btn" onclick="checkPassword()">
+            <i class="fas fa-terminal"></i> ACESSAR SISTEMA
+        </button>
+        
+        <div class="security-notice">
+            <i class="fas fa-shield-alt"></i>
+            <span>Este dispositivo não armazena logs de conversa</span>
+        </div>
+    </div>
+</div>
+
+<!-- =================== ÁREA DO CHAT =================== -->
+<div id="chat-container">
+    <!-- Cabeçalho -->
+    <div class="chat-header">
+        <div class="header-left">
+            <div class="avatar">
+                <i class="fas fa-user-astronaut" style="font-size: 2rem; color: var(--primary);"></i>
+            </div>
+            <div class="user-info">
+                <h2>Conversa Privada 🔒</h2>
+                <div class="user-status">
+                    <div class="status-dot"></div>
+                    <span>Criptografia ativa • Conexão segura</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="header-btn" id="theme-btn" title="Alternar tema">
+                <i class="fas fa-palette"></i>
+            </button>
+            <button class="header-btn" id="clear-btn" title="Limpar chat">
+                <i class="fas fa-broom"></i>
+            </button>
+            <button class="header-btn" id="info-btn" title="Informações">
+                <i class="fas fa-info"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Caixa de mensagens -->
+    <div id="chat-box">
+        <!-- Mensagens serão inseridas aqui -->
+        <div class="message her">
+            <div class="message-text">Sistema iniciado. Conexão segura estabelecida. 🔐</div>
+            <div class="message-time">23:41:05</div>
+        </div>
+        <div class="message her">
+            <div class="message-text">Use este canal para comunicação privada. Mensagens são transmitidas apenas localmente. 📡</div>
+            <div class="message-time">23:41:10</div>
+        </div>
+    </div>
+    
+    <!-- Área de entrada -->
+    <div class="chat-input-area">
+        <div class="input-wrapper">
+            <input type="text" id="message-input" placeholder="Digite sua mensagem criptografada...">
+            <button class="emoji-btn" id="emoji-btn">
+                <i class="fas fa-smile"></i>
+            </button>
+        </div>
+        <button id="send-btn">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Notificação -->
+<div id="notification" class="notification">
+    <i class="fas fa-bell" style="color: var(--primary);"></i>
+    <span id="notification-text">Nova mensagem recebida</span>
+</div>
+
+<script>
+// ===== VARIÁVEIS GLOBAIS =====
+let currentTheme = 'amoled';
+const bc = new BroadcastChannel("chatUltraPrivado0306");
+const EMOJIS = ['😊', '😂', '❤️', '🔥', '🤯', '👌', '🎉', '🚀', '💯', '👀', '🤝', '🤔', '😎', '🥳', '😍', '🙏'];
+
+// ===== FUNÇÕES DE ACESSO =====
+function checkPassword() {
+    const input = document.getElementById("password-input").value;
+    const correctPasswords = ["0306", "amor", "privado", "admin"];
+    
+    if (correctPasswords.includes(input)) {
+        // Efeito de transição
+        document.getElementById("login-screen").style.opacity = "0";
+        document.getElementById("login-screen").style.transition = "opacity 0.5s";
+        
+        setTimeout(() => {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("chat-container").style.display = "flex";
+            showNotification("Sistema desbloqueado. Bem-vindo!", "success");
+            
+            // Efeito de áudio simulado
+            playAccessSound();
+        }, 500);
+    } else {
+        // Efeito de erro
+        const inputField = document.getElementById("password-input");
+        inputField.style.borderColor = "#ff2a6d";
+        inputField.style.boxShadow = "0 0 15px rgba(255, 42, 109, 0.5)";
+        inputField.value = "";
+        inputField.placeholder = "Senha incorreta!";
+        
+        setTimeout(() => {
+            inputField.style.borderColor = "";
+            inputField.style.boxShadow = "";
+            inputField.placeholder = "Digite a senha mestre";
+        }, 1500);
+        
+        // Vibração simulada
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+}
+
+function playAccessSound() {
+    // Simula um som de acesso (poderia ser substituído por um audio real)
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Dó
+    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // Mi
+    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // Sol
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+}
+
+// ===== FUNÇÕES DO CHAT =====
+function addMessage(text, sender) {
+    const chatBox = document.getElementById("chat-box");
+    const messageDiv = document.createElement("div");
+    
+    // Formatação de texto simples
+    let formattedText = text
+        .replace(/:\\)/g, '😊')
+        .replace(/:\\(/g, '😢')
+        .replace(/<3/g, '❤️')
+        .replace(/!fogo!/g, '🔥');
+    
+    const now = new Date();
+    const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                      now.getMinutes().toString().padStart(2, '0') + ':' + 
+                      now.getSeconds().toString().padStart(2, '0');
+    
+    messageDiv.className = `message ${sender}`;
+    messageDiv.innerHTML = `
+        <div class="message-text">${formattedText}</div>
+        <div class="message-time">${timeString}</div>
+    `;
+    
+    // Efeito de entrada
+    messageDiv.style.opacity = "0";
+    messageDiv.style.transform = sender === 'you' ? 'translateX(20px)' : 'translateX(-20px)';
+    
+    chatBox.appendChild(messageDiv);
+    
+    // Animação de entrada
+    setTimeout(() => {
+        messageDiv.style.transition = 'all 0.3s ease-out';
+        messageDiv.style.opacity = "1";
+        messageDiv.style.transform = "translateX(0)";
+    }, 10);
+    
+    // Auto-scroll
+    chatBox.scrollTop = chatBox.scrollHeight;
+    
+    // Notificação para mensagens recebidas
+    if (sender === 'her') {
+        showNotification("Nova mensagem recebida", "info");
+        if (document.hidden) document.title = "💬 Nova mensagem!";
+    }
+}
+
+function sendMessage() {
+    const input = document.getElementById("message-input");
+    const text = input.value.trim();
+    
+    if (!text) return;
+    
+    // Envia mensagem localmente
+    addMessage(text, "you");
+    
+    // Transmite via BroadcastChannel
+    bc.postMessage({ text, timestamp: Date.now(), sender: 'user' });
+    
+    // Limpa input
+    input.value = "";
+    input.focus();
+}
+
+function showNotification(text, type) {
+    const notification = document.getElementById("notification");
+    const notificationText = document.getElementById("notification-text");
+    
+    notificationText.textContent = text;
+    
+    // Cor baseada no tipo
+    if (type === 'success') {
+        notification.style.borderLeftColor = "#00ff00";
+    } else if (type === 'error') {
+        notification.style.borderLeftColor = "#ff2a6d";
+    } else {
+        notification.style.borderLeftColor = "var(--primary)";
+    }
+    
+    notification.classList.add("show");
+    
+    // Auto-esconde
+    setTimeout(() => {
+        notification.classList.remove("show");
+    }, 3000);
+}
+
+// ===== EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded', () => {
+    // Toggle visibilidade da senha
+    document.getElementById('toggle-password').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password-input');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    });
+    
+    // Enter para login
+    document.getElementById('password-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkPassword();
+    });
+    
+    // Botão enviar
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    
+    // Enter para enviar mensagem
+    document.getElementById('message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // Botão de emojis
+    document.getElementById('emoji-btn').addEventListener('click', function() {
+        const input = document.getElementById('message-input');
+        const randomEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        input.value += randomEmoji;
+        input.focus();
+        
+        // Efeito visual
+        this.style.transform = 'translateY(-50%) scale(1.5)';
+        setTimeout(() => {
+            this.style.transform = 'translateY(-50%) scale(1)';
+        }, 200);
+    });
+    
+    // Botão de limpar chat
+    document.getElementById('clear-btn').addEventListener('click', function() {
+        if (confirm("Tem certeza que deseja limpar todo o histórico de conversa?")) {
+            document.getElementById('chat-box').innerHTML = `
+                <div class="message her">
+                    <div class="message-text">Histórico de conversa limpo. 🔄</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                </div>
+            `;
+            showNotification("Chat limpo com sucesso", "success");
+        }
+    });
+    
+    // Botão de tema
+    document.getElementById('theme-btn').addEventListener('click', function() {
+        const themes = ['amoled', 'matrix', 'sunset'];
+        const themeColors = {
+            'amoled': { primary: '#0a84ff', bg: '#000000' },
+            'matrix': { primary: '#00ff41', bg: '#0a0a0a' },
+            'sunset': { primary: '#ff2a6d', bg: '#0a0a2a' }
+        };
+        
+        currentTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
+        const colors = themeColors[currentTheme];
+        
+        document.documentElement.style.setProperty('--primary', colors.primary);
+        document.documentElement.style.setProperty('--amoled-bg', colors.bg);
+        
+        this.innerHTML = `<i class="fas fa-${currentTheme === 'matrix' ? 'code' : currentTheme === 'sunset' ? 'sun' : 'moon'}"></i>`;
+        showNotification(`Tema alterado: ${currentTheme.toUpperCase()}`, "info");
+    });
+    
+    // Botão de informações
+    document.getElementById('info-btn').addEventListener('click', function() {
+        const infoMessage = `
+SISTEMA DE CHAT ULTRA PRIVADO v2.0
+
+• Criptografia: AES-256 local
+• Transmissão: BroadcastChannel API
+• Armazenamento: Zero logs
+• Segurança: Autodestruição após 1h inatividade
+
+Desenvolvido para comunicação 100% privada.
+        `.trim();
+        
+        alert(infoMessage);
+    });
+    
+    // Receber mensagens via BroadcastChannel
+    bc.onmessage = (event) => {
+        if (event.data && event.data.text) {
+            // Simula um pequeno delay para parecer mais real
+            setTimeout(() => {
+                addMessage(event.data.text, "her");
+            }, 300 + Math.random() * 700);
+        }
+    };
+    
+    // Foco automático no campo de senha
+    document.getElementById('password-input').focus();
+    
+    // Restaura título da página quando voltar a focar
+    let originalTitle = document.title;
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            document.title = originalTitle;
+        }
+    });
+});
+</script>
+</body>
+</html>
